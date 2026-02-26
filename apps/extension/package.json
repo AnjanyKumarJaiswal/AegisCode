@@ -1,0 +1,49 @@
+{
+    "name": "@aegiscode/extension",
+    "displayName": "AegisCode",
+    "description": "AI Security Guardian — Real-time security scanning for AI-generated code",
+    "version": "0.1.0",
+    "publisher": "aegiscode",
+    "engines": {
+        "vscode": "^1.96.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [],
+    "main": "./dist/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "aegiscode.startSession",
+                "title": "AegisCode: Start Security Session"
+            },
+            {
+                "command": "aegiscode.stopSession",
+                "title": "AegisCode: Stop Security Session"
+            },
+            {
+                "command": "aegiscode.scanNow",
+                "title": "AegisCode: Scan Now"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "node esbuild.config.js --production",
+        "build": "node esbuild.config.js",
+        "dev": "node esbuild.config.js --watch",
+        "lint": "eslint src/",
+        "clean": "rimraf dist node_modules",
+        "package": "vsce package"
+    },
+    "dependencies": {
+        "@aegiscode/shared": "*"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.96.0",
+        "@types/node": "^20",
+        "esbuild": "^0.24.0",
+        "typescript": "^5",
+        "@vscode/vsce": "^3"
+    }
+}

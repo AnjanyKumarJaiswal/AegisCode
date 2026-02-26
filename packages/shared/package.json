@@ -1,0 +1,16 @@
+{
+    "name": "@aegiscode/shared",
+    "version": "0.1.0",
+    "private": true,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsc --project tsconfig.json",
+        "dev": "tsc --project tsconfig.json --watch",
+        "clean": "rimraf dist node_modules",
+        "lint": "eslint src/"
+    },
+    "devDependencies": {
+        "typescript": "^5"
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "name": "aegiscode",
+    "version": "0.1.0",
+    "private": true,
+    "packageManager": "yarn@1.22.22",
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "turbo run dev",
+        "build": "turbo run build",
+        "lint": "turbo run lint",
+        "clean": "turbo run clean"
+    },
+    "devDependencies": {
+        "turbo": "^2"
+    }
+}

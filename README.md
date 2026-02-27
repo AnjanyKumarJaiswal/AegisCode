@@ -97,3 +97,73 @@ AegisCode/
 ```
 
 All three applications depend on the shared package (`@aegiscode/shared`) for common TypeScript types, constants, and utility functions, ensuring consistency across the entire system.
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) v18 or later
+- [Yarn](https://classic.yarnpkg.com/) v1.22+
+- [PostgreSQL](https://www.postgresql.org/) (for the backend service)
+- [Redis](https://redis.io/) (for session management)
+- [VS Code](https://code.visualstudio.com/) (for running the extension)
+
+## Getting Started
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/AnjanyKumarJaiswal/AegisCode.git
+   cd AegisCode
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   yarn install
+   ```
+
+3. **Build the shared package first** (other apps depend on it)
+
+   ```bash
+   yarn build
+   ```
+
+4. **Start development servers**
+
+   ```bash
+   yarn dev
+   ```
+
+   This starts all applications in development mode simultaneously using Turborepo.
+
+## Development
+
+The monorepo uses [Turborepo](https://turbo.build/) to orchestrate tasks across all workspaces.
+
+| Command | Description |
+|---------|-------------|
+| `yarn dev` | Start all apps in development mode |
+| `yarn build` | Build all apps and packages |
+| `yarn lint` | Lint all apps and packages |
+| `yarn clean` | Clean build artifacts across all workspaces |
+
+### Running Individual Apps
+
+You can also work with individual applications:
+
+```bash
+# VS Code Extension
+cd apps/extension
+yarn build
+
+# Backend Service
+cd apps/server
+yarn start:dev
+
+# Web Dashboard
+cd apps/web
+yarn dev
+```
+
+## License
+
+This project is currently unlicensed. A license will be added in a future release.

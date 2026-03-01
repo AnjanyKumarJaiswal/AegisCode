@@ -1,0 +1,336 @@
+/* ============================================================
+   SIGN IN PAGE
+   ============================================================ */
+
+/* ---------- Full viewport ---------- */
+.signin-page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    overflow: hidden;
+}
+
+/* Dot grid */
+.signin-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, #2A2724 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Tighter amber radial — halos centre content only */
+.signin-page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle 320px at 50% 50%,
+            rgba(196, 98, 26, 0.06) 0%,
+            transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ---------- Boot sequence ---------- */
+.boot-sequence {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    text-align: left;
+    transition: opacity 400ms ease;
+}
+
+.boot-sequence.fading {
+    opacity: 0;
+}
+
+.boot-line {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.8;
+    color: #4A4440;
+    opacity: 0;
+    animation: fadeIn 200ms ease forwards;
+}
+
+.boot-line:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.boot-line:nth-child(2) {
+    animation-delay: 200ms;
+}
+
+.boot-line:nth-child(3) {
+    animation-delay: 400ms;
+}
+
+.boot-line:nth-child(4) {
+    animation-delay: 600ms;
+}
+
+.boot-line--ready {
+    color: #C4701F;
+}
+
+/* ---------- Form container ---------- */
+.signin-form-wrap {
+    position: relative;
+    z-index: 2;
+    width: 380px;
+    max-width: calc(100vw - 48px);
+    opacity: 0;
+    transition: opacity 300ms ease;
+}
+
+.signin-form-wrap.visible {
+    opacity: 1;
+}
+
+/* ---------- Wordmark block ---------- */
+.signin-wordmark-block {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.signin-wordmark {
+    display: block;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 22px;
+    color: #F0EDE8;
+    margin-bottom: 6px;
+}
+
+.signin-descriptor {
+    font-family: var(--font-sans);
+    font-weight: 100;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #2A2724;
+}
+
+/* Rule below wordmark */
+.signin-rule {
+    height: 1px;
+    background: #252220;
+    margin-bottom: 32px;
+    mask-image: linear-gradient(to right, transparent 0%, #252220 8%, #252220 92%, transparent 100%);
+}
+
+/* ---------- Form headline ---------- */
+.signin-headline {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: #E8E4DE;
+    margin-bottom: 8px;
+}
+
+.signin-sub {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: #7A746E;
+    margin-bottom: 32px;
+}
+
+/* ---------- Input fields ---------- */
+.signin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field-label {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: #7A746E;
+    letter-spacing: 0.04em;
+}
+
+.field-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.field-input {
+    width: 100%;
+    height: 42px;
+    background: #0C0B09;
+    border: 1px solid #252220;
+    border-radius: 3px;
+    padding: 0 14px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: #D4CFC9;
+    caret-color: #C4701F;
+    transition: border-color 150ms ease;
+    outline: none;
+}
+
+.field-input::placeholder {
+    color: #3A3532;
+}
+
+.field-input:focus {
+    border-color: #8B6914;
+}
+
+/* Password toggle */
+.field-input.has-toggle {
+    padding-right: 52px;
+}
+
+.pw-toggle {
+    position: absolute;
+    right: 14px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    color: #4A4440;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: color 150ms ease;
+}
+
+.pw-toggle:hover,
+.pw-toggle.active {
+    color: #7A746E;
+}
+
+/* ---------- Submit ---------- */
+.signin-submit-wrap {
+    margin-top: 8px;
+}
+
+.signin-submit {
+    width: 100%;
+    height: 42px;
+    background: transparent;
+    border: 1px solid #8B6914;
+    border-radius: 3px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    color: #C9A84C;
+    cursor: pointer;
+    transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.signin-submit:hover:not(:disabled) {
+    background: rgba(139, 105, 20, 0.06);
+    border-color: #C4701F;
+    color: #E8C97A;
+}
+
+.signin-submit:disabled {
+    cursor: default;
+    opacity: 0.7;
+}
+
+/* Loading dots */
+.dot-1,
+.dot-2,
+.dot-3 {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    color: #C9A84C;
+    animation: dotBlink 1s step-end infinite;
+}
+
+.dot-2 {
+    animation-delay: 333ms;
+}
+
+.dot-3 {
+    animation-delay: 666ms;
+}
+
+@keyframes dotBlink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+/* ---------- Secondary link ---------- */
+.signin-secondary {
+    text-align: center;
+    margin-top: 24px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: #4A4440;
+}
+
+.signin-secondary a,
+.signin-secondary button {
+    background: none;
+    border: none;
+    border-bottom: 1px dashed #BFA560;
+    color: #BFA560;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    cursor: pointer;
+    padding-bottom: 1px;
+    transition: color 150ms ease, border-color 150ms ease;
+}
+
+.signin-secondary a:hover,
+.signin-secondary button:hover {
+    color: #F5F2EE;
+    border-bottom-color: #F5F2EE;
+}
+
+/* ---------- Footer ---------- */
+.signin-footer {
+    position: fixed;
+    bottom: 32px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: var(--font-sans);
+    font-weight: 100;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: #2E2A26;
+    z-index: 2;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+    .signin-form-wrap {
+        width: 100%;
+        max-width: calc(100vw - 40px);
+    }
+}

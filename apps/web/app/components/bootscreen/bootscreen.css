@@ -1,0 +1,182 @@
+/* ============================================================
+   WEBSITE BOOTSCREEN
+   ============================================================ */
+
+.bootscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #0E0D0C;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 400ms ease-in;
+    pointer-events: all;
+}
+
+.bootscreen.exiting {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Dot grid continuity */
+.bootscreen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, #2A2724 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ---------- Center block — fixed-size to prevent layout shift ---------- */
+.bootscreen-center {
+    position: relative;
+    z-index: 1;
+    width: 320px;
+    /* Reserve full final height so flex centering doesn't shift as lines appear */
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ---------- Identity line ---------- */
+.boot-identity {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    margin-bottom: 4px;
+    opacity: 0;
+    animation: bsFadeIn 200ms ease forwards;
+    /* no delay — fires immediately on mount */
+}
+
+.boot-brand {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: #D4CFC9;
+}
+
+.boot-version {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: #3A3532;
+}
+
+/* ---------- Init lines ---------- */
+.boot-init-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 22px;
+}
+
+/* Cursor char — flashes in for ~80ms then fades before text arrives */
+.boot-cursor-char {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #C4701F;
+    opacity: 0;
+    animation: cursorFlash 160ms ease forwards;
+}
+
+/* Text line — fades in at its delay */
+.boot-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #4A4440;
+    opacity: 0;
+    animation: bsFadeIn 150ms ease forwards;
+}
+
+/* ---------- Rule ---------- */
+.boot-rule {
+    height: 1px;
+    width: 320px;
+    /* explicit — never bleeds wider */
+    background: #1E1C1A;
+    margin-top: 4px;
+    opacity: 0;
+    animation: bsFadeIn 150ms ease forwards;
+}
+
+/* ---------- Ready ---------- */
+.boot-ready-text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: #C4701F;
+    opacity: 0;
+    animation: bsFadeIn 200ms ease forwards;
+}
+
+/* ---------- Progress dots ---------- */
+.bootscreen-dots {
+    position: fixed;
+    bottom: 32px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    z-index: 1;
+}
+
+.bootscreen-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #2A2724;
+    animation: dotPulse 600ms ease-in-out infinite;
+}
+
+.bootscreen-dot:nth-child(2) {
+    animation-delay: 200ms;
+}
+
+.bootscreen-dot:nth-child(3) {
+    animation-delay: 400ms;
+}
+
+/* ---------- Keyframes ---------- */
+@keyframes bsFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Cursor appears then vanishes before text arrives */
+@keyframes cursorFlash {
+    0% {
+        opacity: 0;
+    }
+
+    40% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Dots pulse from dim to amber and back */
+@keyframes dotPulse {
+
+    0%,
+    100% {
+        background: #2A2724;
+    }
+
+    50% {
+        background: #C4701F;
+    }
+}

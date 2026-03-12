@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build-extension",
+            "type": "shell",
+            "command": "node esbuild.config.js",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "watch-extension",
+            "type": "shell",
+            "command": "node esbuild.config.js --watch",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$tsc-watch"
+        },
+        {
+            "label": "build-extension-from-root",
+            "type": "shell",
+            "command": "node esbuild.config.js",
+            "options": {
+                "cwd": "${workspaceFolder}/apps/extension"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$tsc"
+        }
+    ]
+}

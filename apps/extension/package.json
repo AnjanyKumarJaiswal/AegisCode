@@ -1,11 +1,12 @@
 {
-    "name": "@aegiscode/extension",
+    "name": "aegiscode",
     "displayName": "AegisCode",
     "description": "AI Security Guardian — Real-time security scanning for AI-generated code",
     "version": "0.1.0",
     "publisher": "aegiscode",
+    "license": "MIT",
     "engines": {
-        "vscode": "^1.96.0"
+        "vscode": "^1.107.0"
     },
     "categories": [
         "Other"
@@ -13,6 +14,24 @@
     "activationEvents": [],
     "main": "./dist/extension.js",
     "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "aegiscode",
+                    "title": "AegisCode",
+                    "icon": "./assets/icon.svg"
+                }
+            ]
+        },
+        "views": {
+            "aegiscode": [
+                {
+                    "type": "webview",
+                    "id": "aegiscode.panel",
+                    "name": "AegisCode"
+                }
+            ]
+        },
         "commands": [
             {
                 "command": "aegiscode.startSession",
@@ -25,8 +44,26 @@
             {
                 "command": "aegiscode.scanNow",
                 "title": "AegisCode: Scan Now"
+            },
+            {
+                "command": "aegiscode.login",
+                "title": "AegisCode: Sign In"
+            },
+            {
+                "command": "aegiscode.logout",
+                "title": "AegisCode: Sign Out"
             }
-        ]
+        ],
+        "configuration": {
+            "title": "AegisCode",
+            "properties": {
+                "aegiscode.serverUrl": {
+                    "type": "string",
+                    "default": "http://localhost:4000",
+                    "description": "URL of the AegisCode backend server."
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "node esbuild.config.js --production",
@@ -40,10 +77,11 @@
         "@aegiscode/shared": "*"
     },
     "devDependencies": {
-        "@types/vscode": "^1.96.0",
         "@types/node": "^20",
+        "@types/vscode": "1.107.0",
+        "@vscode/vsce": "^3.7.1",
+        "dotenv": "^17.3.1",
         "esbuild": "^0.24.0",
-        "typescript": "^5",
-        "@vscode/vsce": "^3"
+        "typescript": "^5"
     }
 }

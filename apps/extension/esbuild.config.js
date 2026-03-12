@@ -1,7 +1,11 @@
 const esbuild = require('esbuild');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 const isProduction = process.argv.includes('--production');
 const isWatch = process.argv.includes('--watch');
+
+const backendUrl = process.env.BACKEND_BASE_API_URL || 'http://localhost:4000';
 
 async function main() {
     const ctx = await esbuild.context({
@@ -15,6 +19,9 @@ async function main() {
         outfile: 'dist/extension.js',
         external: ['vscode'],
         logLevel: 'info',
+        define: {
+            'process.env.BACKEND_BASE_API_URL': JSON.stringify(backendUrl),
+        },
     });
 
     if (isWatch) {

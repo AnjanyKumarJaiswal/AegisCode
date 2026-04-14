@@ -25,5 +25,5 @@ export interface ScanResponse {
 }
 
 export async function scan(request: ScanRequest): Promise<ScanResponse> {
-    return apiRequest<ScanResponse>('POST', '/v1/scan', request);
+    return apiRequest<ScanResponse>('POST', '/api/v1/scan', request);
 }

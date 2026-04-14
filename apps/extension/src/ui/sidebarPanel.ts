@@ -58,6 +58,10 @@ class SidebarPanel implements vscode.WebviewViewProvider {
                 case 'scanProject':
                     vscode.commands.executeCommand('aegiscode.scanNow');
                     break;
+                case 'disconnect':
+                    vscode.commands.executeCommand('aegiscode.logout');
+                    this.setState({ kind: 'disconnected' });
+                    break;
                 case 'newScan':
                     this.setState({ kind: 'idle', scansToday: 0, issuesFound: 0 });
                     break;
@@ -177,6 +181,7 @@ ${isLogin ? `document.addEventListener('keydown',function(e){if(e.key==='Enter')
 <div class="col-btns">
     <button class="btn-secondary full" data-cmd="scanProject">${ic.search} Scan Current File</button>
     <button class="btn-danger full" data-cmd="stopSession">${ic.stop} Stop Session</button>
+    <button class="btn-secondary full" style="margin-top:4px;border-color:transparent;color:#4A4440" data-cmd="disconnect">Disconnect Account</button>
 </div>
 <hr class="divider">
 <div class="stats">
@@ -199,6 +204,7 @@ ${isLogin ? `document.addEventListener('keydown',function(e){if(e.key==='Enter')
 <div class="col-btns">
     <button class="btn-secondary full" data-cmd="openDashboard">Dashboard ${ic.external}</button>
     <button class="btn-danger full" data-cmd="stopSession">${ic.stop} Stop Session</button>
+    <button class="btn-secondary full" style="margin-top:4px;border-color:transparent;color:#4A4440" data-cmd="disconnect">Disconnect Account</button>
 </div>`;
     }
 
@@ -220,6 +226,7 @@ ${isLogin ? `document.addEventListener('keydown',function(e){if(e.key==='Enter')
     <button class="btn-primary full" data-cmd="viewDetails">View Details</button>
     <button class="btn-secondary full" data-cmd="scanProject">${ic.refresh} Re-scan File</button>
     <button class="btn-danger full" data-cmd="stopSession">${ic.stop} Stop Session</button>
+    <button class="btn-secondary full" style="margin-top:4px;border-color:transparent;color:#4A4440" data-cmd="disconnect">Disconnect Account</button>
 </div>`;
     }
 
@@ -239,6 +246,7 @@ ${isLogin ? `document.addEventListener('keydown',function(e){if(e.key==='Enter')
     <button class="btn-primary full" data-cmd="viewDetails">View Detailed Report</button>
     <button class="btn-secondary full" data-cmd="newScan">${ic.refresh} New Scan</button>
     <button class="btn-danger full" data-cmd="stopSession">${ic.stop} Stop Session</button>
+    <button class="btn-secondary full" style="margin-top:4px;border-color:transparent;color:#4A4440" data-cmd="disconnect">Disconnect Account</button>
 </div>`;
     }
 

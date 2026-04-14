@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String           @id @default(uuid())
+  email          String           @unique
+  passwordHash   String?
+  githubId       String?          @unique
+  githubToken    String?          // For GitHub integration
+  credits        Int              @default(100) // Rate limiting / usage
+  sessions       CodingSession[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model CodingSession {
+  id             String           @id @default(uuid())
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status         SessionStatus    @default(ACTIVE)
+  currentScore   Float?           // Latest security score (1-10)
+  scans          ScanReport[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+}
+
+model ScanReport {
+  id             String           @id @default(uuid())
+  sessionId      String
+  session        CodingSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  triggerType    ScanTrigger
+  score          Float            // Score for this specific scan (1-10)
+  vulnerabilities Vulnerability[]
+  createdAt      DateTime         @default(now())
+}
+
+enum ScanTrigger {
+  AUTO_INACTIVITY
+  MANUAL
+}
+
+model Vulnerability {
+  id             String           @id @default(uuid())
+  scanId         String
+  scan           ScanReport       @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  category       String           // e.g., "SQL Injection", "Hardcoded Secret"
+  severity       Severity
+  title          String
+  description    String           @db.Text
+  fileLocation   String           // Path to file
+  lineNumber     Int?
+  fixSuggestion  String           @db.Text // The recommended fix
+  status         VulnStatus       @default(OPEN)
+  createdAt      DateTime         @default(now())
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum VulnStatus {
+  OPEN
+  FIXED
+}

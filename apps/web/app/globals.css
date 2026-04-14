@@ -1,17 +1,20 @@
 @import "tailwindcss";
 
 :root {
-    /* Backgrounds */
+    
+
     --bg: #0E0D0C;
     --bg-terminal: #141210;
     --surface: #1A1714;
 
-    /* Borders */
+    
+
     --border: #2E2A26;
     --border-tag: #7A6020;
     --border-term: #252220;
 
-    /* Text */
+    
+
     --white: #F5F2EE;
     --white-cta: #F0EDE8;
     --grey-sub: #A89F94;
@@ -19,17 +22,20 @@
     --grey-term: #4A4644;
     --term-file: #D4CFC9;
 
-    /* Accent — amber / warm gold */
+    
+
     --amber: #C4701F;
     --amber-tag: #BFA560;
     --amber-grad-a: #D47C2F;
     --amber-grad-b: #E8C97A;
     --amber-vuln: #D4762A;
 
-    /* Status */
+    
+
     --sage: #7A9970;
 
-    /* Fonts */
+    
+
     --font-sans: "Geist", sans-serif;
     --font-serif: "Instrument Serif", serif;
     --font-mono: "IBM Plex Mono", monospace;
@@ -61,19 +67,23 @@ a {
     color: inherit;
 }
 
-/* ---------- Hidden Scrollbar ---------- */
 
-/* Firefox */
+
+
+
+
 * {
     scrollbar-width: none;
 }
 
-/* IE / Edge legacy */
+
+
 * {
     -ms-overflow-style: none;
 }
 
-/* Chrome, Safari, Edge */
+
+
 ::-webkit-scrollbar {
     display: none;
 }

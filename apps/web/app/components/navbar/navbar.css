@@ -1,8 +1,5 @@
-/* ============================================================
-   AEGISCODE NAVBAR
-   ============================================================ */
 
-/* ---------- Fixed Bar ---------- */
+
 .navbar {
     position: fixed;
     top: 0;
@@ -45,7 +42,8 @@
     opacity: 1;
 }
 
-/* ---------- Zones ---------- */
+
+
 .navbar-left {
     display: flex;
     align-items: center;
@@ -67,7 +65,8 @@
     justify-content: flex-end;
 }
 
-/* ---------- Wordmark ---------- */
+
+
 .navbar-wordmark {
     font-family: var(--font-serif);
     font-style: italic;
@@ -95,7 +94,8 @@
     white-space: nowrap;
 }
 
-/* ---------- Nav Links ---------- */
+
+
 .nav-link {
     position: relative;
     font-family: var(--font-sans);
@@ -133,7 +133,8 @@
     opacity: 1;
 }
 
-/* ---------- Right Actions ---------- */
+
+
 .nav-signin {
     font-family: var(--font-sans);
     font-weight: 400;
@@ -171,7 +172,8 @@
     color: #E8C97A;
 }
 
-/* ---------- Mobile Toggle (4-dot grid) ---------- */
+
+
 .navbar-mobile-toggle {
     display: none;
     grid-template-columns: 1fr 1fr;
@@ -189,7 +191,8 @@
     background: #7A746E;
 }
 
-/* ---------- Mobile Overlay ---------- */
+
+
 .navbar-overlay {
     position: fixed;
     inset: 0;
@@ -244,7 +247,8 @@
     gap: 16px;
 }
 
-/* ---------- Responsive ---------- */
+
+
 @media (max-width: 768px) {
     .navbar {
         padding: 0 20px;

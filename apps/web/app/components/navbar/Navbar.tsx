@@ -28,9 +28,6 @@ export default function Navbar() {
     const [activeLink, setActiveLink] = useState<string | null>(null);
     const rafRef = useRef<number>(0);
 
-    // Hide on auth pages
-    if (pathname?.startsWith("/sign-in")) return null;
-
     useEffect(() => {
         const onScroll = () => {
             cancelAnimationFrame(rafRef.current);
@@ -45,17 +42,18 @@ export default function Navbar() {
         return () => { document.body.style.overflow = ""; };
     }, [overlayOpen]);
 
+    // Hide on auth pages
+    if (pathname?.startsWith("/sign-in")) return null;
+
     return (
         <>
             <nav className={`navbar${scrolled ? " scrolled" : ""}`} aria-label="Main navigation">
-                {/* Left — Wordmark */}
                 <div className="navbar-left">
                     <span className="navbar-wordmark">AegisCode</span>
                     <span className="navbar-sep" aria-hidden="true" />
                     <span className="navbar-descriptor">security guardian</span>
                 </div>
 
-                {/* Center — Links (real <a> tags so hash navigation works) */}
                 <div className="navbar-center">
                     {NAV_LINKS.map((link) => (
                         <a
@@ -70,19 +68,16 @@ export default function Navbar() {
                     ))}
                 </div>
 
-                {/* Right — Actions */}
                 <div className="navbar-right">
                     <Link href="/sign-in" className="nav-signin">Sign in</Link>
                     <button className="nav-cta" type="button">Get Early Access</button>
                 </div>
 
-                {/* Mobile toggle */}
                 <button className="navbar-mobile-toggle" aria-label="Open menu" onClick={() => setOverlay(true)} type="button">
                     <MobileDotGrid />
                 </button>
             </nav>
 
-            {/* Mobile Overlay */}
             <div className={`navbar-overlay${overlayOpen ? " open" : ""}`} aria-modal="true" role="dialog" aria-label="Navigation menu">
                 <button className="overlay-close" aria-label="Close menu" onClick={() => setOverlay(false)} type="button">
                     <MobileDotGrid />
@@ -105,3 +100,4 @@ export default function Navbar() {
         </>
     );
 }
+

@@ -45,13 +45,11 @@ export default function Bootscreen() {
             {phase === "running" && (
                 <div className="bootscreen-center">
 
-                    {/* Identity */}
                     <div className="boot-identity">
                         <span className="boot-brand">AegisCode</span>
                         <span className="boot-version">v1.0.0</span>
                     </div>
 
-                    {/* Sequential init lines — pure CSS animation-delay */}
                     {LINES.map(({ text, cursorDelay, textDelay }) => (
                         <div key={text} className="boot-init-line">
                             <span className="boot-cursor-char" style={{ animationDelay: cursorDelay }}>▋</span>
@@ -59,14 +57,12 @@ export default function Bootscreen() {
                         </div>
                     ))}
 
-                    {/* Rule + ready */}
                     <div className="boot-rule" style={{ animationDelay: "1000ms" }} />
                     <span className="boot-ready-text" style={{ animationDelay: "1200ms" }}>ready.</span>
 
                 </div>
             )}
 
-            {/* Progress dots */}
             <div className="bootscreen-dots" aria-hidden="true">
                 <span className="bootscreen-dot" />
                 <span className="bootscreen-dot" />

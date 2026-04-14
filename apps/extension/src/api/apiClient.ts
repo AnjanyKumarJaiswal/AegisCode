@@ -15,7 +15,7 @@ function getBaseUrl(): string {
 }
 
 export async function apiRequest<T>(
-    method: 'GET' | 'POST' | 'DELETE',
+    method: 'GET' | 'POST' | 'DELETE' | 'PATCH',
     path: string,
     body?: unknown
 ): Promise<T> {

@@ -1,8 +1,7 @@
-/* ============================================================
-   AEGISCODE HERO — Revised Design
-   ============================================================ */
 
-/* ---------- Keyframes ---------- */
+
+
+
 @keyframes cursorBlink {
 
     0%,
@@ -37,7 +36,8 @@
     }
 }
 
-/* ---------- Section ---------- */
+
+
 .hero {
     position: relative;
     min-height: 100vh;
@@ -73,7 +73,8 @@
     z-index: 0;
 }
 
-/* ---------- Content Column ---------- */
+
+
 .hero-content {
     position: relative;
     z-index: 1;
@@ -85,7 +86,8 @@
     text-align: center;
 }
 
-/* ---------- Status Tag ---------- */
+
+
 .status-tag {
     display: inline-flex;
     align-items: center;
@@ -108,7 +110,8 @@
     color: var(--amber-tag);
 }
 
-/* ---------- Headline ---------- */
+
+
 .headline {
     display: flex;
     flex-direction: column;
@@ -148,7 +151,8 @@
     background-clip: text;
 }
 
-/* ---------- Subheadline ---------- */
+
+
 .subheadline {
     font-family: var(--font-sans);
     font-weight: 400;
@@ -164,7 +168,8 @@
     animation-delay: 380ms;
 }
 
-/* ---------- CTA Row ---------- */
+
+
 .cta-row {
     display: flex;
     align-items: center;
@@ -213,7 +218,8 @@
     color: var(--white);
 }
 
-/* ---------- Terminal ---------- */
+
+
 .terminal {
     width: 680px;
     max-width: 90vw;
@@ -265,7 +271,8 @@
     align-items: flex-start;
 }
 
-/* ---------- Terminal Lines ---------- */
+
+
 .t-line {
     font-family: var(--font-mono);
     font-size: 13px;
@@ -312,7 +319,8 @@
     animation: cursorBlink 1s step-end infinite;
 }
 
-/* ---------- Bottom Separator ---------- */
+
+
 .hero-separator {
     position: relative;
     z-index: 1;
@@ -327,7 +335,8 @@
             transparent 100%);
 }
 
-/* ---------- Responsive ---------- */
+
+
 @media (max-width: 768px) {
     .hero {
         padding: 80px 20px 0;

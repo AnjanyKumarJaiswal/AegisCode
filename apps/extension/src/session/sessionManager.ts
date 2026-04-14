@@ -52,7 +52,7 @@ class SessionManager {
 
         try {
             const response = await apiStartSession();
-            this.sessionId = response.sessionId;
+            this.sessionId = response.id;
             this.setState('active');
             logger.info('Session started', this.sessionId);
             vscode.window.showInformationMessage('AegisCode: Security session started.');

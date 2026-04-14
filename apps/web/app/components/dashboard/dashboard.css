@@ -1,6 +1,4 @@
-/* ============================================================
-   DASHBOARD / ANALYTICS SECTION
-   ============================================================ */
+
 
 .dashboard {
     position: relative;
@@ -29,7 +27,8 @@
     padding: 0 32px;
 }
 
-/* ---------- Headline block ---------- */
+
+
 .dash-label {
     display: flex;
     justify-content: center;
@@ -86,7 +85,8 @@
     margin-bottom: 64px;
 }
 
-/* ---------- Two-column panels ---------- */
+
+
 .dash-panels {
     display: grid;
     grid-template-columns: 58fr 38fr;
@@ -101,7 +101,8 @@
     padding: 32px;
 }
 
-/* ---------- Panel headers ---------- */
+
+
 .panel-header {
     display: flex;
     align-items: center;
@@ -141,7 +142,8 @@
     border-bottom-color: #C9A84C;
 }
 
-/* ---------- Chart ---------- */
+
+
 .chart-wrap {
     position: relative;
     width: 100%;
@@ -171,7 +173,8 @@
     color: #D4CFC9;
 }
 
-/* ---------- Chart stats ---------- */
+
+
 .chart-stats {
     display: flex;
     align-items: center;
@@ -211,7 +214,8 @@
     flex-shrink: 0;
 }
 
-/* ---------- Vuln list ---------- */
+
+
 .vuln-list {
     display: flex;
     flex-direction: column;
@@ -293,7 +297,8 @@
     border-bottom-color: #F5F2EE;
 }
 
-/* ---------- Callout strip ---------- */
+
+
 .dash-callout {
     margin-top: 16px;
     background: #0C0B09;
@@ -355,7 +360,8 @@
     line-height: 1.4;
 }
 
-/* ---------- Bottom separator ---------- */
+
+
 .dash-separator {
     height: 1px;
     margin-top: 80px;
@@ -363,7 +369,8 @@
     mask-image: linear-gradient(to right, transparent 0%, #1E1C1A 5%, #1E1C1A 95%, transparent 100%);
 }
 
-/* ---------- Responsive ---------- */
+
+
 @media (max-width: 900px) {
     .dash-panels {
         grid-template-columns: 1fr;

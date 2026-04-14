@@ -1,8 +1,7 @@
-/* ============================================================
-   FEATURES / HOW IT WORKS SECTION
-   ============================================================ */
 
-/* ---------- Section ---------- */
+
+
+
 .features {
     position: relative;
     padding: 120px 0 0;
@@ -22,7 +21,8 @@
     z-index: 0;
 }
 
-/* ---------- Content wrapper ---------- */
+
+
 .features-inner {
     position: relative;
     z-index: 1;
@@ -31,7 +31,8 @@
     padding: 0 32px;
 }
 
-/* ---------- Section label ---------- */
+
+
 .features-label {
     display: flex;
     justify-content: center;
@@ -56,7 +57,8 @@
     color: #BFA560;
 }
 
-/* ---------- Section headline ---------- */
+
+
 .features-headline {
     text-align: center;
     margin-bottom: 64px;
@@ -83,7 +85,8 @@
     background-clip: text;
 }
 
-/* ---------- Three-column grid ---------- */
+
+
 /* Gap color trick: grid bg = divider color, columns cover it */
 .features-grid {
     display: grid;
@@ -187,7 +190,8 @@
     color: #4A4444;
 }
 
-/* ---------- Vulnerability tag strip ---------- */
+
+
 .vuln-strip-section {
     margin-top: 64px;
 }
@@ -264,7 +268,8 @@
     flex-shrink: 0;
 }
 
-/* ---------- Bottom separator ---------- */
+
+
 .features-separator {
     height: 1px;
     margin-top: 80px;
@@ -276,7 +281,8 @@
             transparent 100%);
 }
 
-/* ---------- Responsive ---------- */
+
+
 @media (max-width: 1024px) {
     .features-grid {
         grid-template-columns: 1fr 1fr;

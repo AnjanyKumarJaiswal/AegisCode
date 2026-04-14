@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import "./dashboard.css";
 
-/* ── Chart data ─────────────────────────────────────────── */
+
 const DATA = [
     { session: "S1", score: 8.4 },
     { session: "S2", score: 7.2 },
@@ -18,10 +18,9 @@ const DATA = [
 const VW = 560, VH = 160, PAD_X = 10, PAD_Y = 10;
 const UW = VW - PAD_X * 2, UH = VH - PAD_Y * 2;
 
-// INVERTED Y-axis: lower risk score = higher position (smaller y)
 const pts = DATA.map((d, i) => ({
     x: PAD_X + (i / (DATA.length - 1)) * UW,
-    y: PAD_Y + ((10 - d.score) / 10) * UH, // <-- inverted
+    y: PAD_Y + ((10 - d.score) / 10) * UH,
     ...d,
 }));
 
@@ -40,10 +39,8 @@ function buildPath(points: typeof pts): string {
 
 const linePath = buildPath(pts);
 const areaPath = `${linePath} L ${pts[pts.length - 1].x} ${VH - PAD_Y} L ${pts[0].x} ${VH - PAD_Y} Z`;
-// Threshold at risk=5 inverted: y = 10 + ((10-5)/10)*140 = 80
 const threshold = PAD_Y + ((10 - 5) / 10) * UH;
 
-/* ── Vulnerability data ─────────────────────────────────── */
 const VULNS = [
     { file: "auth.ts:47", name: "SQL Injection", sev: "CRITICAL", sevCls: "vuln-severity--critical", rowCls: "vuln-row--critical" },
     { file: "api/user.ts:12", name: "Hardcoded Secret", sev: "CRITICAL", sevCls: "vuln-severity--critical", rowCls: "vuln-row--critical" },
@@ -87,7 +84,6 @@ export default function DashboardSection() {
 
                 <div className="dash-panels">
 
-                    {/* Left — Score timeline */}
                     <div className="dash-panel">
                         <div className="panel-header">
                             <span className="panel-label">Session Score History</span>
@@ -157,7 +153,6 @@ export default function DashboardSection() {
                         </div>
                     </div>
 
-                    {/* Right — Recent findings */}
                     <div className="dash-panel">
                         <div className="panel-header">
                             <span className="panel-label">Recent Findings</span>
@@ -176,7 +171,6 @@ export default function DashboardSection() {
 
                 </div>
 
-                {/* Callout strip */}
                 <div className="dash-callout">
                     <div className="callout-text-wrap">
                         <span className="callout-statement">Security posture improves with every iteration.</span>

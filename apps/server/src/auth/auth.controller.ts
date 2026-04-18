@@ -46,7 +46,18 @@ export class AuthController {
   @UseGuards(GithubAuthGuard)
   async githubCallback(@Req() req: Request, @Res() res: Response) {
     const result = await this.authService.loginWithGithub(req.user as User);
-    const redirectUrl = `${process.env.FRONTEND_BASE_URL}/auth/callback?token=${result.token}`;
+    
+    const params = new URLSearchParams();
+    params.append('token', result.token);
+    
+    if (typeof req.query.source === 'string') {
+      params.append('source', req.query.source);
+    }
+    if (typeof req.query.redirect_uri === 'string') {
+      params.append('redirect_uri', req.query.redirect_uri);
+    }
+    
+    const redirectUrl = `${process.env.FRONTEND_BASE_URL}/auth/callback?${params.toString()}`;
     return res.redirect(redirectUrl);
   }
 

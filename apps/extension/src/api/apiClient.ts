@@ -32,7 +32,7 @@ export async function apiRequest<T>(
 
     if (!response.ok) {
         const text = await response.text().catch(() => response.statusText);
-        logger.error(`API ${method} ${path} failed`, response.status, text);
+        logger.error(`API ${method} ${path} failed`, `Status: ${response.status}`, `Body: ${text}`);
         throw new ApiError(response.status, text);
     }
 

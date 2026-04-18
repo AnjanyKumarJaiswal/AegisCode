@@ -1,7 +1,7 @@
 export default function TerminalArtifact() {
     return (
         <div className="terminal">
-            {/* Header bar */}
+            {}
             <div className="terminal-header">
                 <div className="terminal-dots">
                     <span className="terminal-dot" />
@@ -11,7 +11,7 @@ export default function TerminalArtifact() {
                 <span className="terminal-label">aegis — scan session</span>
             </div>
 
-            {/* Output lines */}
+            {}
             <div className="terminal-body">
                 <span className="t-line">
                     <span className="t-dim">[session] </span>

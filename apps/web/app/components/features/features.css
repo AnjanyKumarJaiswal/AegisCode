@@ -9,7 +9,7 @@
     overflow: hidden;
 }
 
-/* Dot grid — continuous from hero */
+
 .features::before {
     content: "";
     position: absolute;
@@ -87,7 +87,7 @@
 
 
 
-/* Gap color trick: grid bg = divider color, columns cover it */
+
 .features-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -103,7 +103,7 @@
     min-height: 360px;
 }
 
-/* Column index number */
+
 .col-index {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -112,7 +112,7 @@
     margin-bottom: 20px;
 }
 
-/* Column title */
+
 .col-title {
     font-family: var(--font-sans);
     font-weight: 400;
@@ -122,7 +122,7 @@
     margin-bottom: 12px;
 }
 
-/* Column body */
+
 .col-body {
     font-family: var(--font-sans);
     font-weight: 400;
@@ -132,7 +132,7 @@
     flex: 1;
 }
 
-/* Mini-terminal fragment */
+
 .mini-terminal {
     background: #141210;
     border: 1px solid #252220;
@@ -165,7 +165,7 @@
     font-weight: 500;
 }
 
-/* Column status indicator */
+
 .col-status {
     display: flex;
     align-items: center;
@@ -211,7 +211,7 @@
     overflow: hidden;
 }
 
-/* Left + right edge fades */
+
 .vuln-strip-wrapper::before,
 .vuln-strip-wrapper::after {
     content: "";
@@ -289,7 +289,7 @@
         gap: 1px;
     }
 
-    /* Third column full-width on tabletish */
+    
     .features-col:nth-child(3) {
         grid-column: 1 / -1;
         border-top: 1px solid #1E1C1A;

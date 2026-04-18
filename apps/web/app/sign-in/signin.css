@@ -1,8 +1,6 @@
-/* ============================================================
-   SIGN IN PAGE
-   ============================================================ */
 
-/* ---------- Full viewport ---------- */
+
+
 .signin-page {
   position: relative;
   min-height: 100vh;
@@ -14,7 +12,7 @@
   overflow: hidden;
 }
 
-/* Dot grid */
+
 .signin-page::before {
   content: "";
   position: absolute;
@@ -26,7 +24,7 @@
   z-index: 0;
 }
 
-/* Tighter amber radial — halos centre content only */
+
 .signin-page::after {
   content: "";
   position: absolute;
@@ -40,7 +38,7 @@
   z-index: 0;
 }
 
-/* ---------- Boot sequence ---------- */
+
 .boot-sequence {
   position: absolute;
   top: 50%;
@@ -87,7 +85,7 @@
   color: #c4701f;
 }
 
-/* ---------- Form container ---------- */
+
 .signin-form-wrap {
   position: relative;
   z-index: 2;
@@ -101,7 +99,7 @@
   opacity: 1;
 }
 
-/* ---------- Wordmark block ---------- */
+
 .signin-wordmark-block {
   text-align: center;
   margin-bottom: 40px;
@@ -125,7 +123,7 @@
   color: #2a2724;
 }
 
-/* Rule below wordmark */
+
 .signin-rule {
   height: 1px;
   background: #252220;
@@ -139,7 +137,7 @@
   );
 }
 
-/* ---------- Form headline ---------- */
+
 .signin-headline {
   font-family: var(--font-sans);
   font-size: 18px;
@@ -156,7 +154,7 @@
   margin-bottom: 32px;
 }
 
-/* ---------- Input fields ---------- */
+
 .signin-form {
   display: flex;
   flex-direction: column;
@@ -205,7 +203,7 @@
   border-color: #8b6914;
 }
 
-/* Password toggle */
+
 .field-input.has-toggle {
   padding-right: 52px;
 }
@@ -228,7 +226,7 @@
   color: #7a746e;
 }
 
-/* ---------- Submit ---------- */
+
 .signin-submit-wrap {
   margin-top: 8px;
 }
@@ -265,7 +263,7 @@
   opacity: 0.7;
 }
 
-/* Loading dots */
+
 .dot-1,
 .dot-2,
 .dot-3 {
@@ -294,7 +292,7 @@
   }
 }
 
-/* ---------- Secondary link ---------- */
+
 .signin-secondary {
   text-align: center;
   margin-top: 24px;
@@ -324,7 +322,7 @@
   border-bottom-color: #f5f2ee;
 }
 
-/* ---------- Footer ---------- */
+
 .signin-footer {
   position: fixed;
   bottom: 32px;
@@ -339,7 +337,7 @@
   z-index: 2;
 }
 
-/* ---------- GitHub button ---------- */
+
 .signin-github-btn {
   width: 100%;
   height: 42px;
@@ -368,7 +366,7 @@
   color: #a09a94;
 }
 
-/* ---------- Divider ---------- */
+
 .signin-divider {
   display: flex;
   align-items: center;
@@ -393,7 +391,7 @@
   flex-shrink: 0;
 }
 
-/* ---------- Error banner ---------- */
+
 .signin-error {
   background: rgba(239, 68, 68, 0.05);
   border: 1px solid rgba(239, 68, 68, 0.18);
@@ -407,7 +405,7 @@
   letter-spacing: 0.01em;
 }
 
-/* ---------- Responsive ---------- */
+
 @media (max-width: 480px) {
   .signin-form-wrap {
     width: 100%;

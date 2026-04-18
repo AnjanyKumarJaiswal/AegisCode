@@ -91,7 +91,9 @@ export default function SignInPage() {
   }
 
   function handleGithub() {
-    window.location.href = auth.githubOAuthUrl();
+    const params = new URLSearchParams(window.location.search);
+    const redirectUri = params.get("redirect_uri");
+    window.location.href = auth.githubOAuthUrl(redirectUri || undefined);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -102,11 +104,26 @@ export default function SignInPage() {
     setSubmitting(true);
 
     try {
+      let token: string;
       if (mode === "login") {
-        await auth.login({ email, password });
+        token = await auth.login({ email, password });
       } else {
-        await auth.register({ email, password });
+        token = await auth.register({ email, password });
       }
+
+      const params = new URLSearchParams(window.location.search);
+      const redirectUri = params.get("redirect_uri");
+
+      if (redirectUri) {
+        try {
+          const url = new URL(redirectUri);
+          url.searchParams.set("token", token);
+          window.location.href = url.toString();
+        } catch (err) {
+          console.error("Invalid redirect_uri", err);
+        }
+      }
+
       router.push("/dashboard");
     } catch {
     } finally {
@@ -119,7 +136,7 @@ export default function SignInPage() {
 
   return (
     <div className="signin-page">
-      {/* Boot sequence */}
+      {}
       {showBoot && phase !== "form" && (
         <div
           className={`boot-sequence${phase === "fading" ? " fading" : ""}`}
@@ -136,19 +153,19 @@ export default function SignInPage() {
         </div>
       )}
 
-      {/* Sign-in / Register form */}
+      {}
       <div
         className={`signin-form-wrap${isForm ? " visible" : ""}`}
         aria-hidden={!isForm}
       >
-        {/* Wordmark */}
+        {}
         <div className="signin-wordmark-block">
           <span className="signin-wordmark">AegisCode</span>
           <span className="signin-descriptor">security guardian</span>
         </div>
         <div className="signin-rule" aria-hidden="true" />
 
-        {/* Headline */}
+        {}
         <h1 className="signin-headline">
           {mode === "login" ? "Access your workspace." : "Create your account."}
         </h1>
@@ -158,14 +175,14 @@ export default function SignInPage() {
             : "Start securing your AI-generated code."}
         </p>
 
-        {/* GitHub OAuth */}
+        {}
         <button
           type="button"
           className="signin-github-btn"
           onClick={handleGithub}
           aria-label="Continue with GitHub"
         >
-          {/* GitHub mark */}
+          {}
           <svg
             width="16"
             height="16"
@@ -178,21 +195,21 @@ export default function SignInPage() {
           Continue with GitHub
         </button>
 
-        {/* Divider */}
+        {}
         <div className="signin-divider" aria-hidden="true">
           <span className="signin-divider-text">or</span>
         </div>
 
-        {/* Error banner */}
+        {}
         {activeError && (
           <div className="signin-error" role="alert">
             {activeError}
           </div>
         )}
 
-        {/* Form */}
+        {}
         <form className="signin-form" onSubmit={handleSubmit} noValidate>
-          {/* Email */}
+          {}
           <div className="field-group">
             <label className="field-label" htmlFor="email">
               Email address
@@ -214,7 +231,7 @@ export default function SignInPage() {
             </div>
           </div>
 
-          {/* Password */}
+          {}
           <div className="field-group">
             <label className="field-label" htmlFor="password">
               Password
@@ -246,7 +263,7 @@ export default function SignInPage() {
             </div>
           </div>
 
-          {/* Submit */}
+          {}
           <div className="signin-submit-wrap">
             <button
               type="submit"
@@ -269,7 +286,7 @@ export default function SignInPage() {
           </div>
         </form>
 
-        {/* Mode toggle */}
+        {}
         <p className="signin-secondary">
           {mode === "login" ? (
             <>
@@ -289,7 +306,7 @@ export default function SignInPage() {
         </p>
       </div>
 
-      {/* Footer watermark */}
+      {}
       <footer className="signin-footer" aria-hidden="true">
         AegisCode · Secured by dual-agent scanning
       </footer>

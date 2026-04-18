@@ -5,7 +5,7 @@ import "./bootscreen.css";
 
 type Phase = "idle" | "running" | "exiting" | "done";
 
-// Module-level: resets on page load, persists across route changes
+
 let _bootShown = false;
 
 const LINES = [
@@ -21,10 +21,10 @@ export default function Bootscreen() {
         if (_bootShown) { setPhase("done"); return; }
         _bootShown = true;
 
-        // Trigger CSS animations by mounting content
+        
         setPhase("running");
 
-        // At 1600ms: exit when assets ready
+        
         const t = setTimeout(() => {
             const startExit = () => {
                 setPhase("exiting");

@@ -1,5 +1,12 @@
 import * as vscode from 'vscode';
 import type { Vulnerability, ScanResponse } from '../api/scanApi';
+import {
+    AlertTriangle,
+    AlertCircle,
+    Info,
+    CheckCircle,
+    Shield,
+} from './icons';
 
 class ResultsPanel {
     private panel: vscode.WebviewPanel | undefined;
@@ -31,7 +38,7 @@ class ResultsPanel {
     clear(): void {
         this.lastResult = undefined;
         if (this.panel) {
-            this.panel.webview.html = this.buildHtml({ scanId: '', vulnerabilities: [] });
+            this.panel.webview.html = this.buildHtml({ scanId: '', score: 10, vulnerabilities: [] });
         }
     }
 
@@ -42,11 +49,26 @@ class ResultsPanel {
     private severityColor(severity: string): string {
         const map: Record<string, string> = {
             critical: '#E05A5A',
-            high: '#D47C2F',
-            medium: '#C4A020',
-            low: '#62d13dff',
+            high: '#ff9d12',
+            medium: '#dfc15b',
+            low: '#7A9970',
         };
         return map[severity] ?? '#A89F94';
+    }
+
+    private severityIcon(severity: string, size = 14): string {
+        switch (severity) {
+            case 'critical':
+                return `<span style="color:#E05A5A">${AlertTriangle(size)}</span>`;
+            case 'high':
+                return `<span style="color:#ff9d12">${AlertCircle(size)}</span>`;
+            case 'medium':
+                return `<span style="color:#dfc15b">${Info(size)}</span>`;
+            case 'low':
+                return `<span style="color:#7A9970">${CheckCircle(size)}</span>`;
+            default:
+                return `<span style="color:#A89F94">${Info(size)}</span>`;
+        }
     }
 
     private buildVulnCard(vuln: Vulnerability): string {
@@ -55,6 +77,7 @@ class ResultsPanel {
         <div class="card">
             <div class="card-header">
                 <span class="badge" style="border-color:${color};color:${color}">${vuln.severity.toUpperCase()}</span>
+                ${this.severityIcon(vuln.severity, 13)}
                 <span class="vuln-type">${this.escape(vuln.type)}</span>
                 <span class="line-ref">Line ${vuln.line}${vuln.endLine !== vuln.line ? `–${vuln.endLine}` : ''}</span>
             </div>
@@ -63,8 +86,8 @@ class ResultsPanel {
         </div>`;
     }
 
-    private escape(str: string): string {
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    private escape(str: string | undefined | null): string {
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     private buildHtml(result: ScanResponse): string {
@@ -74,7 +97,7 @@ class ResultsPanel {
         const cards = issueCount > 0
             ? vulns.map(v => this.buildVulnCard(v)).join('')
             : `<div class="empty">
-                <span class="empty-icon">✦</span>
+                <span class="empty-icon">${Shield(32)}</span>
                 <p>No vulnerabilities detected in this scan.</p>
                </div>`;
 
@@ -86,15 +109,32 @@ class ResultsPanel {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AegisCode Scan Results</title>
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+        --bg: #0E0D0C;
+        --panel: #1A1714;
+        --panel-2: #201D19;
+        --border: #2E2A26;
+        --copy: #E8E2D9;
+        --copy-dim: #A89F94;
+        --copy-faint: #5C5650;
+        --amber: #FF9D12;
+        --amber-dark: #C4701F;
+        --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+        --font-sans: "Inter", "Segoe UI", -apple-system, sans-serif;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-        background: #0E0D0C;
-        color: #F5F2EE;
-        font-family: -apple-system, 'Segoe UI', sans-serif;
+        background: var(--bg);
+        color: var(--copy);
+        font-family: var(--font-sans);
         font-size: 13px;
         padding: 24px;
         min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
     }
 
     .header {
@@ -103,35 +143,60 @@ class ResultsPanel {
         gap: 12px;
         margin-bottom: 24px;
         padding-bottom: 16px;
-        border-bottom: 1px solid #2E2A26;
+        border-bottom: 1px solid var(--border);
     }
 
-    .logo { font-size: 18px; font-weight: 600; color: #F5F2EE; letter-spacing: -0.3px; }
-    .logo span { color: #C4701F; }
+    .logo {
+        font-family: var(--font-mono);
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--copy);
+        letter-spacing: 0.04em;
+    }
 
-    .meta { margin-left: auto; color: #A89F94; font-size: 12px; }
+    .logo span { color: var(--amber); }
+
+    .meta {
+        margin-left: auto;
+        color: var(--copy-dim);
+        font-family: var(--font-mono);
+        font-size: 11px;
+    }
 
     .summary {
         display: flex;
-        gap: 12px;
+        gap: 10px;
         margin-bottom: 20px;
     }
 
     .stat {
-        background: #1A1714;
-        border: 1px solid #2E2A26;
+        background: var(--panel);
+        border: 1px solid var(--border);
         border-radius: 6px;
-        padding: 10px 16px;
+        padding: 12px 16px;
         flex: 1;
         text-align: center;
     }
 
-    .stat-value { font-size: 22px; font-weight: 600; color: #F5F2EE; }
-    .stat-label { font-size: 11px; color: #A89F94; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value {
+        font-family: var(--font-mono);
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--copy);
+    }
+
+    .stat-label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--copy-dim);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
 
     .card {
-        background: #1A1714;
-        border: 1px solid #2E2A26;
+        background: var(--panel);
+        border: 1px solid var(--border);
         border-radius: 8px;
         padding: 14px 16px;
         margin-bottom: 10px;
@@ -140,61 +205,88 @@ class ResultsPanel {
     .card-header {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         margin-bottom: 8px;
     }
 
     .badge {
-        font-size: 10px;
-        font-weight: 700;
+        font-family: var(--font-mono);
+        font-size: 9px;
+        font-weight: 800;
         padding: 2px 7px;
         border-radius: 4px;
         border: 1px solid;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.06em;
         flex-shrink: 0;
     }
 
-    .vuln-type { font-weight: 600; font-size: 13px; color: #F5F2EE; }
+    .vuln-type {
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--copy);
+    }
 
     .line-ref {
         margin-left: auto;
+        font-family: var(--font-mono);
         font-size: 11px;
-        color: #A89F94;
-        font-family: 'Menlo', 'Consolas', monospace;
+        color: var(--copy-dim);
         white-space: nowrap;
     }
 
-    .description { color: #A89F94; line-height: 1.6; font-size: 12px; }
+    .description {
+        color: var(--copy-dim);
+        line-height: 1.6;
+        font-size: 12px;
+    }
 
     .suggestion {
         margin-top: 8px;
-        padding: 8px 10px;
-        background: #141210;
-        border-left: 2px solid #C4701F;
+        padding: 8px 12px;
+        background: var(--bg);
+        border-left: 2px solid var(--amber);
         border-radius: 0 4px 4px 0;
         font-size: 12px;
-        color: #D4CFC9;
+        color: var(--copy);
         line-height: 1.6;
     }
 
-    .suggestion-label { color: #C4701F; font-weight: 600; margin-right: 4px; }
+    .suggestion-label {
+        color: var(--amber);
+        font-weight: 700;
+        margin-right: 4px;
+    }
 
     .empty {
         text-align: center;
         padding: 60px 24px;
-        color: #4A4440;
+        color: var(--copy-faint);
     }
 
-    .empty-icon { font-size: 32px; display: block; margin-bottom: 12px; color: #7A9970; }
-    .empty p { color: #A89F94; }
+    .empty-icon {
+        display: block;
+        margin: 0 auto 16px;
+        color: #7A9970;
+    }
+
+    .empty p {
+        color: var(--copy-dim);
+        font-size: 14px;
+    }
 
     .section-title {
-        font-size: 11px;
+        font-family: var(--font-mono);
+        font-size: 10px;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
-        color: #4A4440;
+        letter-spacing: 0.12em;
+        color: var(--copy-faint);
         margin-bottom: 12px;
+        font-weight: 700;
     }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -213,7 +305,7 @@ class ResultsPanel {
         <div class="stat-label">High / Critical</div>
     </div>
     <div class="stat">
-        <div class="stat-value" style="color:#C4A020">${vulns.filter(v => v.severity === 'medium').length}</div>
+        <div class="stat-value" style="color:#dfc15b">${vulns.filter(v => v.severity === 'medium').length}</div>
         <div class="stat-label">Medium</div>
     </div>
     <div class="stat">

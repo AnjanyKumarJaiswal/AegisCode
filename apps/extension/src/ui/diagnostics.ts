@@ -6,6 +6,7 @@ const SEVERITY_MAP: Record<string, vscode.DiagnosticSeverity> = {
     high: vscode.DiagnosticSeverity.Error,
     medium: vscode.DiagnosticSeverity.Warning,
     low: vscode.DiagnosticSeverity.Information,
+    info: vscode.DiagnosticSeverity.Information,
 };
 
 class Diagnostics {

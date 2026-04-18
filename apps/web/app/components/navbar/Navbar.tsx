@@ -42,7 +42,7 @@ export default function Navbar() {
         return () => { document.body.style.overflow = ""; };
     }, [overlayOpen]);
 
-    // Hide on auth pages
+    
     if (pathname?.startsWith("/sign-in")) return null;
 
     return (

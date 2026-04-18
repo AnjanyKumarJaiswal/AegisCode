@@ -18,7 +18,7 @@ export default function HeroSection() {
                 </div>
             </section>
 
-            {/* Full-width separator with edge fade */}
+            {}
             <div className="hero-separator" aria-hidden="true" />
         </>
     );

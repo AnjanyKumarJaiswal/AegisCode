@@ -6,6 +6,7 @@ export interface JwtPayload {
 export interface SanitizedUser {
   id: string;
   email: string;
+  username: string | null;
   githubId: string | null;
   createdAt: Date;
   updatedAt: Date;

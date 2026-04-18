@@ -5,14 +5,16 @@ import { debounce } from '../utils/debounce';
 import { logger } from '../utils/logger';
 import type { ScanResponse } from '../api/scanApi';
 
-const DEBOUNCE_DELAY_MS = 600;
+const DEBOUNCE_DELAY_MS = 5000;
 const IGNORED_SCHEMES = new Set(['output', 'debug', 'walkThrough', 'vscode', 'git']);
 
 type ScanResultHandler = (uri: vscode.Uri, result: ScanResponse) => void;
+type ScanStartHandler = (uri: vscode.Uri) => void;
 
 class CodeScanner {
     private disposable: vscode.Disposable | undefined;
     private listeners: ScanResultHandler[] = [];
+    private scanStartListeners: ScanStartHandler[] = [];
 
     private readonly debouncedScan = debounce(async (document: vscode.TextDocument) => {
         const sessionId = sessionManager.getSessionId();
@@ -27,6 +29,7 @@ class CodeScanner {
 
         try {
             logger.info('Scanning', document.fileName);
+            this.scanStartListeners.forEach(listener => listener(document.uri));
             const result = await scan({
                 sessionId,
                 filePath: document.uri.fsPath,
@@ -35,8 +38,8 @@ class CodeScanner {
             });
             logger.info(`Scan complete — ${result.vulnerabilities.length} issue(s)`, document.fileName);
             this.listeners.forEach(l => l(document.uri, result));
-        } catch (err) {
-            logger.error('Scan failed', err);
+        } catch (err: any) {
+            logger.error('Scan failed', err.message || err.toString(), err.stack);
         }
     }, DEBOUNCE_DELAY_MS);
 
@@ -44,6 +47,13 @@ class CodeScanner {
         this.listeners.push(handler);
         return new vscode.Disposable(() => {
             this.listeners = this.listeners.filter(l => l !== handler);
+        });
+    }
+
+    onScanStart(handler: ScanStartHandler): vscode.Disposable {
+        this.scanStartListeners.push(handler);
+        return new vscode.Disposable(() => {
+            this.scanStartListeners = this.scanStartListeners.filter(l => l !== handler);
         });
     }
 
@@ -64,9 +74,11 @@ class CodeScanner {
             }
 
             if (!sessionManager.isActive()) {
+                logger.info('Document changed but no active session - ignored', document.fileName);
                 return;
             }
 
+            logger.info('Document changed, starting debouncer...', document.fileName);
             this.debouncedScan(document);
         });
 

@@ -33,10 +33,12 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     }
 
     const email = profile.emails?.[0]?.value ?? `${profile.id}@github.noemail`;
+    const username = profile.username ?? null;
 
     return this.authService.validateGithubUser(
       String(profile.id),
       email,
+      username,
       accessToken,
     );
   }

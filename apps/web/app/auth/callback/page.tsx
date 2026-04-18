@@ -1,18 +1,7 @@
 import { Suspense } from "react";
 import AuthCallbackHandler from "./AuthCallbackHandler";
 
-/**
- * /auth/callback
- *
- * Landing page for the GitHub OAuth redirect from the backend.
- * The backend sends the user here after a successful GitHub login:
- *
- *   FRONTEND_BASE_URL/auth/callback?token=<jwt>
- *
- * useSearchParams() inside AuthCallbackHandler requires a Suspense boundary
- * per Next.js App Router rules — without it the build will warn and the page
- * will be excluded from static optimisation.
- */
+
 export default function AuthCallbackPage() {
   return (
     <Suspense

@@ -18,23 +18,23 @@ export default function FeaturesSection() {
         <section className="features" id="how-it-works" aria-label="How It Works">
             <div className="features-inner">
 
-                {/* Section label */}
+                {}
                 <div className="features-label">
                     <div className="features-pill">
                         <span className="features-pill-text">The Scanning Pipeline</span>
                     </div>
                 </div>
 
-                {/* Section headline */}
+                {}
                 <div className="features-headline">
                     <span className="features-headline-line">Catch What Your AI Agent</span>
                     <span className="features-headline-line gradient">Was Never Built To Catch.</span>
                 </div>
 
-                {/* Three-column grid — 1px gap is the divider */}
+                {}
                 <div className="features-grid">
 
-                    {/* Column 1 — Session Tracking */}
+                    {}
                     <div className="features-col">
                         <span className="col-index">01</span>
                         <h3 className="col-title">Session Tracking</h3>
@@ -60,7 +60,7 @@ export default function FeaturesSection() {
                         </div>
                     </div>
 
-                    {/* Column 2 — Dual-Agent Analysis */}
+                    {}
                     <div className="features-col">
                         <span className="col-index">02</span>
                         <h3 className="col-title">Dual-Agent Analysis</h3>
@@ -86,7 +86,7 @@ export default function FeaturesSection() {
                         </div>
                     </div>
 
-                    {/* Column 3 — Score-Driven Iteration */}
+                    {}
                     <div className="features-col">
                         <span className="col-index">03</span>
                         <h3 className="col-title">Score-Driven Iteration</h3>
@@ -115,7 +115,7 @@ export default function FeaturesSection() {
 
                 </div>
 
-                {/* Vulnerability tag strip */}
+                {}
                 <div className="vuln-strip-section">
                     <span className="vuln-strip-label">Evaluated Against</span>
                     <div className="vuln-strip-wrapper">
@@ -129,7 +129,7 @@ export default function FeaturesSection() {
 
             </div>
 
-            {/* Bottom separator */}
+            {}
             <div className="features-separator" aria-hidden="true" />
         </section>
     );

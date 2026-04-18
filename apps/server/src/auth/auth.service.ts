@@ -27,7 +27,7 @@ export class AuthService {
 
   private sanitizeUser(user: User): SanitizedUser {
     const { passwordHash, githubToken, ...safe } = user;
-    return safe as SanitizedUser;
+    return safe as unknown as SanitizedUser;
   }
 
   async register(email: string, password: string): Promise<AuthResponse> {
@@ -62,11 +62,13 @@ export class AuthService {
   async validateGithubUser(
     githubId: string,
     email: string,
+    username: string | null,
     accessToken: string,
   ) {
     return this.userService.createOrUpdateGithubUser(
       githubId,
       email,
+      username,
       accessToken,
     );
   }

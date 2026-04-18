@@ -25,15 +25,13 @@ interface AuthState {
 }
 
 interface AuthContextValue extends AuthState {
-  login: (payload: LoginPayload) => Promise<void>;
-  register: (payload: RegisterPayload) => Promise<void>;
+  login: (payload: LoginPayload) => Promise<string>;
+  register: (payload: RegisterPayload) => Promise<string>;
   loginWithToken: (token: string) => Promise<void>;
-  logout: () => void;
-  githubOAuthUrl: () => string;
+  logout: () => Promise<void>;
+  githubOAuthUrl: (redirectUri?: string) => string;
   clearError: () => void;
 }
-
-const TOKEN_KEY = "aegiscode.token";
 
 function getClient(): AuthApiClient {
   const baseUrl =
@@ -41,9 +39,27 @@ function getClient(): AuthApiClient {
   return new AuthApiClient(baseUrl);
 }
 
-function readStoredToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
+
+async function readStoredToken(): Promise<string | null> {
+  try {
+    const res = await fetch("/api/auth/session");
+    const data = await res.json();
+    return data.token || null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeStoredToken(token: string): Promise<void> {
+  await fetch("/api/auth/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
+  });
+}
+
+async function clearStoredToken(): Promise<void> {
+  await fetch("/api/auth/session", { method: "DELETE" });
 }
 
 function humaniseError(err: unknown, context: "login" | "register"): string {
@@ -71,10 +87,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function restoreSession() {
-      const stored = readStoredToken();
+      const stored = await readStoredToken();
 
       if (!stored || isTokenExpired(stored)) {
-        if (stored) localStorage.removeItem(TOKEN_KEY);
+        if (stored) await clearStoredToken();
         setState({ user: null, token: null, isLoading: false, error: null });
         return;
       }
@@ -83,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const user = await getClient().me(stored);
         setState({ user, token: stored, isLoading: false, error: null });
       } catch {
-        localStorage.removeItem(TOKEN_KEY);
+        await clearStoredToken();
         setState({ user: null, token: null, isLoading: false, error: null });
       }
     }
@@ -91,17 +107,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void restoreSession();
   }, []);
 
-  const persist = useCallback((token: string, user: SanitizedUser) => {
-    localStorage.setItem(TOKEN_KEY, token);
+  const persist = useCallback(async (token: string, user: SanitizedUser) => {
+    await writeStoredToken(token);
     setState({ user, token, isLoading: false, error: null });
   }, []);
 
   const login = useCallback(
-    async (payload: LoginPayload): Promise<void> => {
+    async (payload: LoginPayload): Promise<string> => {
       setState((s) => ({ ...s, isLoading: true, error: null }));
       try {
         const { user, token } = await getClient().login(payload);
-        persist(token, user);
+        await persist(token, user);
+        return token;
       } catch (err) {
         const message = humaniseError(err, "login");
         setState((s) => ({ ...s, isLoading: false, error: message }));
@@ -112,11 +129,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const register = useCallback(
-    async (payload: RegisterPayload): Promise<void> => {
+    async (payload: RegisterPayload): Promise<string> => {
       setState((s) => ({ ...s, isLoading: true, error: null }));
       try {
         const { user, token } = await getClient().register(payload);
-        persist(token, user);
+        await persist(token, user);
+        return token;
       } catch (err) {
         const message = humaniseError(err, "register");
         setState((s) => ({ ...s, isLoading: false, error: message }));
@@ -131,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setState((s) => ({ ...s, isLoading: true, error: null }));
       try {
         const user = await getClient().me(token);
-        persist(token, user);
+        await persist(token, user);
       } catch (err) {
         setState((s) => ({
           ...s,
@@ -144,13 +162,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [persist],
   );
 
-  const logout = useCallback((): void => {
-    localStorage.removeItem(TOKEN_KEY);
+  const logout = useCallback(async (): Promise<void> => {
+    await clearStoredToken();
     setState({ user: null, token: null, isLoading: false, error: null });
   }, []);
 
   const githubOAuthUrl = useCallback(
-    (): string => getClient().githubOAuthUrl(),
+    (redirectUri?: string): string => getClient().githubOAuthUrl(redirectUri),
     [],
   );
 

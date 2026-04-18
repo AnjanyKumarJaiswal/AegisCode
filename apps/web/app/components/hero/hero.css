@@ -49,7 +49,7 @@
     background: var(--bg);
 }
 
-/* Ambient top-center warm radial */
+
 .hero::before {
     content: "";
     position: absolute;
@@ -61,7 +61,7 @@
     z-index: 0;
 }
 
-/* Dot grid */
+
 .hero::after {
     content: "";
     position: absolute;

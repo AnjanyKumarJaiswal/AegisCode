@@ -5,22 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { isTokenExpired } from "@aegiscode/shared";
 import { useAuth } from "../../context/AuthContext";
 
-/**
- * Handles the GitHub OAuth redirect from the backend.
- *
- * The backend redirects here after a successful GitHub login:
- *   FRONTEND_BASE_URL/auth/callback?token=<jwt>
- *
- * This component:
- *   1. Reads the token from the URL search params.
- *   2. Runs a local expiry check — rejects immediately if the JWT is expired.
- *   3. Calls loginWithToken(), which validates the token with the backend
- *      and commits it to the AuthContext + localStorage.
- *   4. Redirects to /dashboard on success, or /sign-in with an error param
- *      on failure.
- *
- * The `handled` ref prevents the effect from firing twice in React Strict Mode.
- */
 export default function AuthCallbackHandler() {
   const router = useRouter();
   const params = useSearchParams();
@@ -32,20 +16,44 @@ export default function AuthCallbackHandler() {
     handled.current = true;
 
     const token = params.get("token");
+    const source = params.get("source");
+    const redirectUri = params.get("redirect_uri");
 
-    // ── Guard: no token in URL ───────────────────────────────────────────────
     if (!token) {
       router.replace("/sign-in?error=missing_token");
       return;
     }
 
-    // ── Guard: token already expired client-side ─────────────────────────────
     if (isTokenExpired(token)) {
       router.replace("/sign-in?error=expired_token");
       return;
     }
 
-    // ── Validate with backend and persist ────────────────────────────────────
+    if (redirectUri) {
+      try {
+        const url = new URL(redirectUri);
+        url.searchParams.set("token", token);
+
+        window.location.href = url.toString();
+
+        loginWithToken(token).finally(() => {
+          router.replace("/dashboard");
+        });
+        return;
+      } catch (err) {
+        console.error("Invalid redirect_uri", err);
+      }
+    }
+    if (source === "vscode") {
+      const vscodeUri = `vscode://aegiscode.aegiscode/auth/callback?token=${encodeURIComponent(token)}`;
+      window.location.href = vscodeUri;
+
+      loginWithToken(token).finally(() => {
+        router.replace("/dashboard");
+      });
+      return;
+    }
+
     loginWithToken(token)
       .then(() => {
         router.replace("/dashboard");
@@ -55,7 +63,6 @@ export default function AuthCallbackHandler() {
       });
   }, [params, router, loginWithToken]);
 
-  // ── Loading UI ───────────────────────────────────────────────────────────────
   return (
     <div
       style={{

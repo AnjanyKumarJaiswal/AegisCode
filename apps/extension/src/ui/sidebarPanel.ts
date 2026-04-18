@@ -3,6 +3,7 @@ import { setToken } from '../auth/tokenStore';
 import { sessionManager } from '../session/sessionManager';
 import { resultsPanel } from './resultsPanel';
 import type { Vulnerability, ScanResponse } from '../api/scanApi';
+import { logger } from '../utils/logger';
 
 export type PanelState =
     | { kind: 'disconnected' }
@@ -40,6 +41,7 @@ class SidebarPanel implements vscode.WebviewViewProvider {
         webviewView.webview.html = this._buildHtml(this._state);
 
         webviewView.webview.onDidReceiveMessage(async (msg: { command: string; apiKey?: string }) => {
+            logger.info(`Webview sent command: ${msg.command}`);
             switch (msg.command) {
                 case 'connect':
                     if (msg.apiKey?.trim()) { await setToken(msg.apiKey.trim()); }
@@ -50,7 +52,10 @@ class SidebarPanel implements vscode.WebviewViewProvider {
                     await sessionManager.stop();
                     break;
                 case 'viewDetails':
-                    vscode.commands.executeCommand('aegiscode.scanNow');
+                    vscode.commands.executeCommand('aegiscode.insertToChat');
+                    break;
+                case 'insertToChat':
+                    vscode.commands.executeCommand('aegiscode.insertToChat');
                     break;
                 case 'openDashboard':
                     vscode.env.openExternal(vscode.Uri.parse(frontend_url));
@@ -82,7 +87,7 @@ class SidebarPanel implements vscode.WebviewViewProvider {
     }
 
     private _esc(s: string): string {
-        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     private _basename(p: string): string {
@@ -118,6 +123,90 @@ class SidebarPanel implements vscode.WebviewViewProvider {
 </body></html>`;
     }
 
+    private _css(): string {
+        return `
+:root {
+    --bg: #0E0D0C;
+    --bg-sec: #141210;
+    --surface: #1A1714;
+    --border: #2E2A26;
+    --white: #F5F2EE;
+    --grey-sub: #A89F94;
+    --grey-dim: #4A4440;
+    --amber: #C4701F;
+    --amber-grad: linear-gradient(135deg, #D47C2F 0%, #E8C97A 100%);
+    --sage: #7A9970;
+    --red: #E05A5A;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.shell { display: flex; flex-direction: column; min-height: 100vh; padding: 16px 12px; gap: 20px; }
+
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.logo { font-family: "IBM Plex Mono", "Menlo", monospace; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--white); display: flex; align-items: center; gap: 8px; }
+.badge-ok { font-size: 10px; color: var(--sage); font-weight: 500; display: flex; align-items: center; gap: 4px; background: rgba(122, 153, 112, 0.1); padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(122, 153, 112, 0.2); }
+
+.card { background: var(--bg-sec); border: 1px solid var(--border); border-radius: 8px; padding: 14px; position: relative; overflow: hidden; }
+.card-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--grey-dim); margin-bottom: 8px; font-weight: 700; display: block; }
+
+.status-row { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.dot { width: 6px; height: 6px; border-radius: 50%; }
+.green { background: var(--sage); box-shadow: 0 0 8px var(--sage); }
+.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.9); } }
+.pulse { animation: pulse 2s ease-in-out infinite; }
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.stat-box { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; }
+.stat-val { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 600; color: var(--white); display: block; margin-top: 2px; }
+.stat-key { font-size: 9px; color: var(--grey-sub); text-transform: uppercase; letter-spacing: 0.5px; }
+
+.btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+button { font-family: inherit; font-size: 11px; font-weight: 600; padding: 10px; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; outline: none; }
+button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+button:active { transform: translateY(0); }
+
+.btn-primary { background: var(--amber-grad); color: #000; border: none; box-shadow: 0 4px 12px rgba(196, 112, 31, 0.2); }
+.btn-secondary { background: var(--surface); color: var(--white); border-color: var(--border); }
+.btn-danger { background: rgba(224, 90, 90, 0.05); color: var(--red); border-color: rgba(224, 90, 90, 0.2); }
+.btn-ghost { background: transparent; color: var(--grey-dim); border: none; font-size: 10px; margin-top: 4px; font-weight: 400; }
+.btn-ghost:hover { color: var(--grey-sub); background: transparent; }
+
+.field { margin-bottom: 4px; }
+.field-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px; color: var(--white); font-family: "IBM Plex Mono", monospace; font-size: 12px; outline: none; transition: border-color 0.2s; }
+.field-input:focus { border-color: var(--amber); }
+
+.vuln-item { padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 10px; }
+.vuln-item:last-child { border-bottom: none; }
+.vuln-sev { width: 4px; height: 16px; border-radius: 2px; flex-shrink: 0; margin-top: 2px; }
+.sev-critical { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.sev-high { background: #D47C2F; }
+.sev-medium { background: #C4A020; }
+.sev-low { background: var(--sage); }
+.vuln-meta { display: flex; flex-direction: column; gap: 2px; }
+.vuln-name { font-weight: 700; font-size: 11px; color: var(--white); }
+.vuln-file { font-size: 9px; color: var(--grey-dim); font-family: "IBM Plex Mono", monospace; }
+
+.infobox { font-size: 11px; color: var(--grey-sub); font-style: italic; text-align: center; padding: 0 10px; }
+.loader-container { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 20px 0; }
+.loader-bar { width: 100%; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; position: relative; }
+.loader-progress { position: absolute; width: 30%; height: 100%; background: var(--amber-grad); animation: slide 1.5s infinite linear; }
+@keyframes slide { from { left: -30%; } to { left: 100%; } }
+
+.hint { font-size: 10px; color: var(--grey-dim); text-align: center; margin-top: 10px; }
+.hint a { color: var(--amber); text-decoration: underline; cursor: pointer; }
+`;
+    }
+
     private _script(state: PanelState): string {
         const isLogin = state.kind === 'disconnected';
         return `const vsc=acquireVsCodeApi();
@@ -139,172 +228,137 @@ ${isLogin ? `document.addEventListener('keydown',function(e){if(e.key==='Enter')
             case 'active':       return this._active(state);
             case 'alert':        return this._alert(state);
             case 'complete':     return this._complete(state);
+            default: return '';
         }
     }
 
     private _disconnected(): string {
         return `
-<p class="section-label">Connect to Security Platform</p>
-<div class="field">
-    <label class="field-label">${ic.key} API Key</label>
-    <input id="apiKey" class="field-input" type="password" placeholder="Paste your API key..." />
-</div>
-<div class="row">
-    <button class="btn-primary" data-cmd="connect">Connect</button>
-    <button class="btn-secondary" data-cmd="openDashboard">Get Key ${ic.external}</button>
-</div>
-<p class="hint">New user? <a data-cmd="openDashboard">Sign up at aegiscode.com</a></p>`;
+    <div class="card">
+        <span class="card-label">Security Gateway</span>
+        <div class="field">
+            <input id="apiKey" class="field-input" type="password" placeholder="Enter API Key" />
+        </div>
+        <div class="btn-group">
+            <button class="btn-primary" data-cmd="connect">Authenticate Session</button>
+            <button class="btn-secondary" data-cmd="openDashboard">Get Web Key ${ic.external}</button>
+        </div>
+        <p class="hint">No account? <a data-cmd="openDashboard">Go to dashboard</a></p>
+    </div>`;
     }
 
     private _connecting(): string {
         return `
-<div class="center">
-    <p class="sub" style="margin-bottom:18px;">Activating AI Vulnerability<br>Detection...</p>
-    <div class="loader">${'<div class="ldot"></div>'.repeat(8)}</div>
-    <ul class="steps">
-        <li>Connecting to security platform...</li>
-        <li>Initializing AI models...</li>
-        <li>Setting up real-time monitoring...</li>
-    </ul>
-</div>`;
+    <div class="loader-container">
+        <p class="card-label">Initializing Pipeline</p>
+        <div class="loader-bar"><div class="loader-progress"></div></div>
+        <p class="infobox">Establishing secure tunnel to intelligence loop...</p>
+    </div>`;
     }
 
     private _idle(state: { scansToday: number; issuesFound: number }): string {
         return `
-<div class="status-row"><span class="dot green"></span><span>Monitoring Active (Idle)</span></div>
-<p class="sub" style="margin-bottom:14px;">No recent AI activity detected</p>
-<hr class="divider">
-<div class="infobox">
-    <div class="infobox-title">${ic.info} Manual Scan</div>
-    Want to scan existing code for vulnerabilities?
-</div>
-<div class="col-btns">
-    <button class="btn-secondary full" data-cmd="scanProject">${ic.search} Scan Current File</button>
-    <button class="btn-danger full" data-cmd="stopSession">${ic.stop} Stop Session</button>
-    <button class="btn-secondary full" style="margin-top:4px;border-color:transparent;color:#4A4440" data-cmd="disconnect">Disconnect Account</button>
-</div>
-<hr class="divider">
-<div class="stats">
-    <div class="stat-row"><span class="sk">Scans Today</span><span class="sv">${state.scansToday}</span></div>
-    <div class="stat-row"><span class="sk">Issues Found</span><span class="sv">${state.issuesFound}</span></div>
-</div>
-<button class="btn-secondary full" data-cmd="openDashboard">Dashboard ${ic.external}</button>`;
+    <div class="card">
+        <div class="status-row">
+            <span class="dot green pulse"></span>
+            <span class="card-label" style="margin:0">Monitoring Service Idle</span>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-val">${state.scansToday}</span>
+                <span class="stat-key">Scans Done</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val">${state.issuesFound}</span>
+                <span class="stat-key">Risk Flags</span>
+            </div>
+        </div>
+    </div>
+    <div class="btn-group">
+        <button class="btn-primary" data-cmd="scanProject">${ic.search} Manual Audit</button>
+        <button class="btn-danger" data-cmd="stopSession">${ic.stop} Close Pipeline</button>
+        <button class="btn-ghost" data-cmd="disconnect">Disconnect Account</button>
+    </div>
+    <p class="infobox" style="margin-top:20px;">Watching for real-time AI code generation events...</p>`;
     }
 
     private _active(state: { currentFile: string; scansToday: number; issuesFound: number }): string {
         return `
-<div class="status-row"><span class="dot red pulse"></span><span>MONITORING ACTIVE</span></div>
-<p class="sub" style="margin-bottom:14px;">Analyzing code changes...</p>
-<div class="stats">
-    <div class="stat-row"><span class="sk">Current File</span><span class="sv trunc">${state.currentFile ? this._basename(state.currentFile) : '—'}</span></div>
-    <div class="stat-row"><span class="sk">Scans Today</span><span class="sv">${state.scansToday}</span></div>
-    <div class="stat-row"><span class="sk">Issues Found</span><span class="sv">${state.issuesFound}</span></div>
-</div>
-<hr class="divider">
-<div class="col-btns">
-    <button class="btn-secondary full" data-cmd="openDashboard">Dashboard ${ic.external}</button>
-    <button class="btn-danger full" data-cmd="stopSession">${ic.stop} Stop Session</button>
-    <button class="btn-secondary full" style="margin-top:4px;border-color:transparent;color:#4A4440" data-cmd="disconnect">Disconnect Account</button>
-</div>`;
+    <div class="card">
+        <div class="status-row">
+            <span class="dot red pulse"></span>
+            <span class="card-label" style="margin:0">Deep Analysis Active</span>
+        </div>
+        <p class="sub" style="margin-top:8px; font-size:10px; color:var(--grey-sub)">Inspecting: <span style="color:var(--white)">${state.currentFile ? this._basename(state.currentFile) : 'Scanning...'}</span></p>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-val">${state.scansToday}</span>
+                <span class="stat-key">Audit Loop</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val">${state.issuesFound}</span>
+                <span class="stat-key">Vulnerabilities</span>
+            </div>
+        </div>
+    </div>
+    <div class="btn-group">
+        <button class="btn-danger" data-cmd="stopSession">${ic.stop} Terminate</button>
+        <button class="btn-ghost" data-cmd="disconnect">Disconnect</button>
+    </div>`;
     }
 
     private _alert(state: { currentFile: string; vulnerabilities: Vulnerability[] }): string {
-        const groups = { critical: [] as Vulnerability[], high: [] as Vulnerability[], medium: [] as Vulnerability[], low: [] as Vulnerability[] };
-        for (const v of state.vulnerabilities) { groups[v.severity as keyof typeof groups]?.push(v); }
-        const items = [
-            ...groups.critical.map(v => `<li>${this._esc(v.type)}</li>`),
-            ...groups.high.map(v => `<li class="high">${this._esc(v.type)}</li>`),
-            ...groups.medium.map(v => `<li class="med">${this._esc(v.type)}</li>`),
-            ...groups.low.map(v => `<li class="low">${this._esc(v.type)}</li>`),
-        ].join('');
+        const items = state.vulnerabilities.map(v => `
+        <div class="vuln-item">
+            <div class="vuln-sev sev-${v.severity}"></div>
+            <div class="vuln-meta">
+                <span class="vuln-name">${this._esc(v.type)}</span>
+                <span class="vuln-file">${v.severity.toUpperCase()} REASONING</span>
+            </div>
+        </div>`).join('');
+
         return `
-<div class="alert-head">${ic.warning}<span>VULNERABILITIES DETECTED</span></div>
-<div class="infobox-title" style="margin-bottom:6px;">${ic.chart} Quick Summary:</div>
-<ul class="vuln-list">${items}</ul>
-<p class="loc">${ic.pin} <span>${state.currentFile ? this._basename(state.currentFile) : '—'}</span></p>
-<div class="col-btns">
-    <button class="btn-primary full" data-cmd="viewDetails">View Details</button>
-    <button class="btn-secondary full" data-cmd="scanProject">${ic.refresh} Re-scan File</button>
-    <button class="btn-danger full" data-cmd="stopSession">${ic.stop} Stop Session</button>
-    <button class="btn-secondary full" style="margin-top:4px;border-color:transparent;color:#4A4440" data-cmd="disconnect">Disconnect Account</button>
-</div>`;
+    <div class="card" style="border-color:rgba(224, 90, 90, 0.3)">
+        <div class="status-row" style="color:var(--red)">
+            ${ic.warning}
+            <span class="card-label" style="margin:0; color:var(--red)">Vulnerabilities Flagged</span>
+        </div>
+        <div style="margin-top:12px;">
+            ${items}
+        </div>
+    </div>
+    <div class="btn-group">
+        <button class="btn-primary" data-cmd="insertToChat">Insert to Chat 💬</button>
+        <button class="btn-secondary" data-cmd="scanProject">${ic.refresh} Re-Analyze</button>
+        <button class="btn-danger" data-cmd="stopSession">${ic.stop} Stop</button>
+        <button class="btn-ghost" data-cmd="disconnect">Disconnect</button>
+    </div>`;
     }
 
     private _complete(state: { result: ScanResponse }): string {
         const v = state.result.vulnerabilities;
         const count = (s: string) => v.filter(x => x.severity === s).length;
+        
         return `
-<p class="section-label">Results Summary</p>
-<ul class="sev-list">
-    <li><span class="sev-dot" style="background:#E05A5A"></span><span class="sk">Critical</span><span class="sv">${count('critical')}</span></li>
-    <li><span class="sev-dot" style="background:#D47C2F"></span><span class="sk">High</span><span class="sv">${count('high')}</span></li>
-    <li><span class="sev-dot" style="background:#C4A020"></span><span class="sk">Medium</span><span class="sv">${count('medium')}</span></li>
-    <li><span class="sev-dot" style="background:#62d13d"></span><span class="sk">Low</span><span class="sv">${count('low')}</span></li>
-</ul>
-<hr class="divider">
-<div class="col-btns">
-    <button class="btn-primary full" data-cmd="viewDetails">View Detailed Report</button>
-    <button class="btn-secondary full" data-cmd="newScan">${ic.refresh} New Scan</button>
-    <button class="btn-danger full" data-cmd="stopSession">${ic.stop} Stop Session</button>
-    <button class="btn-secondary full" style="margin-top:4px;border-color:transparent;color:#4A4440" data-cmd="disconnect">Disconnect Account</button>
-</div>`;
-    }
-
-    private _css(): string {
-        return `
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:#0E0D0C;color:#F5F2EE;font-family:'Menlo','Consolas',monospace;font-size:12px;line-height:1.6;overflow-x:hidden;}
-.shell{display:flex;flex-direction:column;min-height:100vh;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #2E2A26;background:#141210;position:sticky;top:0;z-index:10;}
-.logo{font-weight:700;font-size:11px;letter-spacing:0.3px;display:flex;align-items:center;gap:6px;}
-.badge-ok{font-size:10px;color:#7A9970;display:flex;align-items:center;gap:4px;}
-.body{padding:14px 12px;flex:1;}
-.section-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#4A4440;margin-bottom:10px;}
-.status-row{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;margin-bottom:12px;}
-.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.green{background:#62d13d;box-shadow:0 0 6px #62d13d88;}
-.red{background:#E05A5A;box-shadow:0 0 6px #E05A5A88;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-.pulse{animation:pulse 1.4s infinite;}
-.divider{border:none;border-top:1px solid #2E2A26;margin:14px 0;}
-.stats{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
-.stat-row,.sev-list li{display:flex;align-items:center;gap:8px;padding:3px 0;}
-.sev-list{list-style:none;margin-bottom:14px;}
-.sev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.sk{color:#A89F94;font-size:11px;flex:1;}
-.sv{color:#F5F2EE;font-size:11px;font-weight:600;}
-.trunc{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-button{font-family:inherit;font-size:11px;padding:5px 10px;border-radius:4px;border:1px solid #2E2A26;cursor:pointer;transition:opacity 0.15s;display:flex;align-items:center;justify-content:center;gap:5px;}
-button:hover{opacity:0.75;}
-.btn-primary{background:#C4701F;color:#F5F2EE;border-color:#C4701F;font-weight:600;}
-.btn-secondary{background:#1A1714;color:#A89F94;border-color:#2E2A26;}
-.btn-danger{background:#1A1714;color:#E05A5A;border-color:#E05A5A44;}
-.full{width:100%;}
-.row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
-.col-btns{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
-.field{margin-bottom:12px;}
-.field-label{display:flex;align-items:center;gap:5px;font-size:10px;color:#A89F94;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
-.field-input{width:100%;background:#141210;border:1px solid #2E2A26;border-radius:4px;padding:6px 8px;color:#F5F2EE;font-family:inherit;font-size:12px;outline:none;}
-.field-input:focus{border-color:#C4701F;}
-.hint{margin-top:12px;font-size:10px;color:#4A4440;}
-.hint a{color:#C4701F;cursor:pointer;}
-.sub{color:#A89F94;font-size:11px;}
-.center{text-align:center;padding:16px 0;}
-.loader{display:flex;justify-content:center;gap:4px;margin:16px 0;}
-.ldot{width:8px;height:8px;border-radius:50%;background:#C4701F;}
-.ldot:nth-child(1){animation:lp 1.2s 0s infinite;}.ldot:nth-child(2){animation:lp 1.2s .15s infinite;}.ldot:nth-child(3){animation:lp 1.2s .3s infinite;}.ldot:nth-child(4){animation:lp 1.2s .45s infinite;}
-.ldot:nth-child(5){animation:lp 1.2s .6s infinite;background:#2E2A26;}.ldot:nth-child(6){animation:lp 1.2s .75s infinite;background:#2E2A26;}.ldot:nth-child(7){animation:lp 1.2s .9s infinite;background:#2E2A26;}.ldot:nth-child(8){animation:lp 1.2s 1.05s infinite;background:#2E2A26;}
-@keyframes lp{0%,100%{opacity:0.3;transform:scale(0.8);}50%{opacity:1;transform:scale(1.1);}}
-.steps{list-style:none;text-align:left;font-size:11px;color:#A89F94;line-height:2;}
-.steps li::before{content:'– ';color:#C4701F;}
-.infobox{background:#141210;border:1px solid #2E2A26;border-radius:4px;padding:10px 12px;margin:12px 0;font-size:11px;color:#A89F94;}
-.infobox-title{display:flex;align-items:center;gap:5px;color:#C4701F;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
-.alert-head{display:flex;align-items:center;gap:8px;color:#E05A5A;font-weight:700;font-size:12px;margin-bottom:12px;}
-.vuln-list{list-style:none;margin-bottom:12px;}
-.vuln-list li{font-size:11px;color:#A89F94;padding:2px 0 2px 10px;position:relative;}
-.vuln-list li::before{content:'•';position:absolute;left:0;color:#E05A5A;}
-.vuln-list li.high::before{color:#D47C2F;}.vuln-list li.med::before{color:#C4A020;}.vuln-list li.low::before{color:#62d13d;}
-.loc{display:flex;align-items:center;gap:5px;font-size:10px;color:#4A4440;margin-bottom:14px;}.loc span{color:#A89F94;}`;
+    <div class="card">
+        <span class="card-label">Audit Complete</span>
+        <div class="stats-grid">
+            <div class="stat-box" style="border-color:var(--red)">
+                <span class="stat-val" style="color:var(--red)">${count('critical') + count('high')}</span>
+                <span class="stat-key">High Risk</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val">${count('medium') + count('low')}</span>
+                <span class="stat-key">Warnings</span>
+            </div>
+        </div>
+    </div>
+    <div class="btn-group">
+        <button class="btn-primary" data-cmd="insertToChat">Insert to Chat 💬</button>
+        <button class="btn-secondary" data-cmd="newScan">${ic.refresh} New Audit</button>
+        <button class="btn-danger" data-cmd="stopSession">${ic.stop} Stop</button>
+        <button class="btn-ghost" data-cmd="disconnect">Disconnect</button>
+    </div>`;
     }
 }
 

@@ -68,7 +68,8 @@ export class AuthApiClient {
     return this.request<SanitizedUser>('GET', AUTH_ROUTES.ME, undefined, token);
   }
 
-  githubOAuthUrl(): string {
-    return `${this.baseUrl}${AUTH_ROUTES.GITHUB}`;
+  githubOAuthUrl(redirectUri?: string): string {
+    const base = `${this.baseUrl}${AUTH_ROUTES.GITHUB}`;
+    return redirectUri ? `${base}?redirect_uri=${encodeURIComponent(redirectUri)}` : base;
   }
 }

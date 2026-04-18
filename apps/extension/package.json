@@ -11,7 +11,17 @@
     "categories": [
         "Other"
     ],
-    "activationEvents": [],
+    "activationEvents": [
+        "onUri",
+        "onView:aegiscode.panel",
+        "onCommand:aegiscode.startSession",
+        "onCommand:aegiscode.stopSession",
+        "onCommand:aegiscode.scanNow",
+        "onCommand:aegiscode.scanWorkspace",
+        "onCommand:aegiscode.login",
+        "onCommand:aegiscode.logout",
+        "onCommand:aegiscode.signInGithub"
+    ],
     "main": "./dist/extension.js",
     "contributes": {
         "viewsContainers": {
@@ -46,12 +56,20 @@
                 "title": "AegisCode: Scan Now"
             },
             {
+                "command": "aegiscode.scanWorkspace",
+                "title": "AegisCode: Scan Workspace"
+            },
+            {
                 "command": "aegiscode.login",
                 "title": "AegisCode: Sign In"
             },
             {
                 "command": "aegiscode.logout",
                 "title": "AegisCode: Sign Out"
+            },
+            {
+                "command": "aegiscode.signInGithub",
+                "title": "AegisCode: Sign In with GitHub"
             }
         ],
         "configuration": {

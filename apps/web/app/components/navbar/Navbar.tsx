@@ -43,7 +43,14 @@ export default function Navbar() {
     }, [overlayOpen]);
 
     
-    if (pathname?.startsWith("/sign-in")) return null;
+    const isDashboardRoute = pathname?.startsWith("/dashboard") || 
+                             pathname?.startsWith("/threats") || 
+                             pathname?.startsWith("/vulnerabilities") || 
+                             pathname?.startsWith("/logs") || 
+                             pathname?.startsWith("/settings") || 
+                             pathname?.startsWith("/sign-in");
+
+    if (isDashboardRoute) return null;
 
     return (
         <>

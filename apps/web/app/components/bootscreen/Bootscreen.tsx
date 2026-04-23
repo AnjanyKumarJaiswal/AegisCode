@@ -15,14 +15,11 @@ const LINES = [
 ] as const;
 
 export default function Bootscreen() {
-    const [phase, setPhase] = useState<Phase>("idle");
+    const [phase, setPhase] = useState<Phase>(_bootShown ? "done" : "running");
 
     useEffect(() => {
-        if (_bootShown) { setPhase("done"); return; }
+        if (_bootShown && phase === "done") { return; }
         _bootShown = true;
-
-        
-        setPhase("running");
 
         
         const t = setTimeout(() => {

@@ -1,89 +1,35 @@
 @import "tailwindcss";
 
 :root {
-    
-
     --bg: #0E0D0C;
-    --bg-terminal: #141210;
+    --bg-card: #141210;
     --surface: #1A1714;
-
-    
-
     --border: #2E2A26;
-    --border-tag: #7A6020;
-    --border-term: #252220;
-
-    
-
     --white: #F5F2EE;
-    --white-cta: #F0EDE8;
-    --grey-sub: #A89F94;
+    --grey: #A89F94;
     --grey-dim: #4A4440;
-    --grey-term: #4A4644;
-    --term-file: #D4CFC9;
-
-    
-
     --amber: #C4701F;
-    --amber-tag: #BFA560;
-    --amber-grad-a: #D47C2F;
-    --amber-grad-b: #E8C97A;
-    --amber-vuln: #D4762A;
-
-    
-
+    --amber-dim: #7A6020;
+    --vuln: #D4762A;
     --sage: #7A9970;
 
-    
-
-    --font-sans: "Geist", sans-serif;
-    --font-serif: "Instrument Serif", serif;
+    --font-sans: "Geist", system-ui, sans-serif;
     --font-mono: "IBM Plex Mono", monospace;
-}
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html {
-    scroll-behavior: smooth;
 }
 
 body {
     background: var(--bg);
     color: var(--white);
     font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
+    margin: 0;
 }
 
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-
-
-
-
-
-* {
-    scrollbar-width: none;
-}
-
-
-
-* {
-    -ms-overflow-style: none;
-}
-
-
-
-::-webkit-scrollbar {
+.custom-scrollbar::-webkit-scrollbar {
+    width: 0;
     display: none;
+}
+
+.custom-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }

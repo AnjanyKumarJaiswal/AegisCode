@@ -9,8 +9,10 @@ import {
   HttpCode,
   HttpStatus,
   UsePipes,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { UserService } from './user.service';
 import { RegisterSchema, type RegisterDto } from './dto/register.dto';
 import { LoginSchema, type LoginDto } from './dto/login.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -22,7 +24,10 @@ import type { User } from '@prisma/client';
 
 @Controller('api/v1/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @Post('register')
   @UsePipes(new ZodValidationPipe(RegisterSchema))
@@ -66,5 +71,21 @@ export class AuthController {
   async me(@Req() req: Request) {
     const user = req.user as User;
     return this.authService.me(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('ide-sync')
+  @HttpCode(HttpStatus.OK)
+  async syncIde(@Req() req: Request, @Body() body: { ideClient?: unknown }) {
+    const user = req.user as User;
+    const ideClient =
+      typeof body?.ideClient === 'string' ? body.ideClient.trim() : '';
+
+    if (!ideClient) {
+      throw new BadRequestException('ideClient is required');
+    }
+
+    await this.userService.recordIdeClient(user.id, ideClient);
+    return { success: true };
   }
 }

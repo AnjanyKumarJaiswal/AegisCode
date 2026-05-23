@@ -15,9 +15,37 @@ model User {
   username       String?
   passwordHash   String?
   githubId       String?          @unique
-  githubToken    String?          
-  credits        Int              @default(100) 
+  githubToken    String?
+  credits        Int              @default(100)
   sessions       CodingSession[]
+  settings       UserSettings?
+  profile        UserProfile?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model UserSettings {
+  id             String           @id @default(uuid())
+  userId         String           @unique
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId      String           @unique
+  secretKey      String           @db.Text
+  criticalAlerts Boolean          @default(true)
+  weeklySummary  Boolean          @default(false)
+  lastIdeClient  String?
+  lastIdeSyncAt  DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model UserProfile {
+  id             String           @id @default(uuid())
+  userId         String           @unique
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String?
+  role           String?
+  bio            String?          @db.Text
+  region         String           @default("local")
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 }
@@ -27,7 +55,8 @@ model CodingSession {
   userId         String
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   status         SessionStatus    @default(ACTIVE)
-  currentScore   Float?           
+  currentScore   Float?
+  ideClient      String?
   scans          ScanReport[]
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
@@ -43,7 +72,10 @@ model ScanReport {
   sessionId      String
   session        CodingSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   triggerType    ScanTrigger
-  score          Float            
+  score          Float
+  filePath       String?
+  languageId     String?
+  sourceContent  String?          @db.Text
   vulnerabilities Vulnerability[]
   createdAt      DateTime         @default(now())
 }
@@ -57,13 +89,13 @@ model Vulnerability {
   id             String           @id @default(uuid())
   scanId         String
   scan           ScanReport       @relation(fields: [scanId], references: [id], onDelete: Cascade)
-  category       String           
+  category       String
   severity       Severity
   title          String
   description    String           @db.Text
-  fileLocation   String           
+  fileLocation   String
   lineNumber     Int?
-  fixSuggestion  String           @db.Text 
+  fixSuggestion  String           @db.Text
   status         VulnStatus       @default(OPEN)
   createdAt      DateTime         @default(now())
 }

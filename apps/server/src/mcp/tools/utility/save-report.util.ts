@@ -52,6 +52,9 @@ export async function saveReport(
         sessionId: ctx.sessionId,
         triggerType: TRIGGER_MAP[ctx.triggerType],
         score,
+        filePath: ctx.filePath,
+        languageId: ctx.language,
+        sourceContent: ctx.code,
         vulnerabilities: {
           create: findings.map((f) => ({
             category: f.category,

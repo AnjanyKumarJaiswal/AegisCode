@@ -1,12 +1,17 @@
 import { Module } from '@nestjs/common';
-import { DashboardController } from './dashboard.controller';
-import { DashboardService } from './dashboard.service';
-import { AuthModule } from '../auth/auth.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { LogsModule } from './logs/logs.module';
+import { SettingsModule } from './settings/settings.module';
+import { ThreatsModule } from './threats/threats.module';
+import { VulnerabilitiesModule } from './vulnerabilities/vulnerabilities.module';
 
 @Module({
-  imports: [AuthModule],
-  controllers: [DashboardController],
-  providers: [DashboardService],
-  exports: [DashboardService],
+  imports: [
+    DashboardModule,
+    LogsModule,
+    SettingsModule,
+    ThreatsModule,
+    VulnerabilitiesModule,
+  ],
 })
 export class V2Module {}

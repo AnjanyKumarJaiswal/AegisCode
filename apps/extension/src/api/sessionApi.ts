@@ -1,4 +1,5 @@
 import { apiRequest } from './apiClient';
+import { getIdeClientName } from '../utils/ideClient';
 
 export interface SessionStartResponse {
     id: string;
@@ -13,7 +14,9 @@ export interface SessionStopResponse {
 }
 
 export async function startSession(): Promise<SessionStartResponse> {
-    return apiRequest<SessionStartResponse>('POST', '/api/v1/sessions');
+    return apiRequest<SessionStartResponse>('POST', '/api/v1/sessions', {
+        ideClient: getIdeClientName(),
+    });
 }
 
 export async function stopSession(id: string): Promise<SessionStopResponse> {

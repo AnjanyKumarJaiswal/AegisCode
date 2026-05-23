@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { getToken, setToken, deleteToken, setUsername, getUsername } from "./tokenStore";
 import { logger } from "../utils/logger";
+import { syncIdeClient } from "../utils/ideClient";
 import { AuthApiClient, AuthApiError, isTokenExpired } from "@aegiscode/shared";
 
 function createAuthClient(): AuthApiClient {
@@ -17,12 +18,15 @@ function deriveDisplayName(user: { username?: string | null; email: string }): s
 }
 
 export async function loginWithGithub(): Promise<void> {
-  const client = createAuthClient();
+  await openWebSignIn();
+}
+
+export async function openWebSignIn(): Promise<void> {
   const ideScheme = vscode.env.uriScheme;
   const callbackUri = `${ideScheme}://aegiscode.aegiscode/auth/callback`;
   const frontendUrl = process.env.FRONTEND_BASE_URL || "http://localhost:3000";
   const loginUrl = `${frontendUrl}/sign-in?redirect_uri=${encodeURIComponent(callbackUri)}`;
-  
+
   await vscode.env.openExternal(vscode.Uri.parse(loginUrl));
 }
 
@@ -41,6 +45,7 @@ export async function handleOAuthCallback(token: string): Promise<boolean> {
     await setToken(token);
     const displayName = deriveDisplayName(user);
     await setUsername(displayName);
+    await syncIdeClient();
 
     logger.info(`OAuth: signed in as ${displayName} (${user.email})`);
     vscode.window.showInformationMessage(`AegisCode: Signed in as ${displayName}`);

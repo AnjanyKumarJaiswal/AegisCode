@@ -5,22 +5,39 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { UserService } from '../../auth/user.service';
 import { SessionStatus } from '@prisma/client';
 
 @Injectable()
 export class SessionService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService,
+  ) {}
 
-  async startSession(userId: string) {
-    return this.prisma.codingSession.create({
-      data: { userId },
+  async startSession(userId: string, ideClient?: string) {
+    const trimmedIde =
+      typeof ideClient === 'string' ? ideClient.trim() : undefined;
+
+    const session = await this.prisma.codingSession.create({
+      data: {
+        userId,
+        ...(trimmedIde ? { ideClient: trimmedIde } : {}),
+      },
       select: {
         id: true,
         status: true,
         currentScore: true,
+        ideClient: true,
         createdAt: true,
       },
     });
+
+    if (trimmedIde) {
+      await this.userService.recordIdeClient(userId, trimmedIde);
+    }
+
+    return session;
   }
 
   async endSession(sessionId: string, userId: string) {

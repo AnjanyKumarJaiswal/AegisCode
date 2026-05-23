@@ -4,6 +4,7 @@ import {
   Patch,
   Get,
   Param,
+  Body,
   UseGuards,
   Req,
   HttpCode,
@@ -21,9 +22,12 @@ export class SessionController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async startSession(@Req() req: Request) {
+  async startSession(
+    @Req() req: Request,
+    @Body() body?: { ideClient?: string },
+  ) {
     const user = req.user as User;
-    return this.sessionService.startSession(user.id);
+    return this.sessionService.startSession(user.id, body?.ideClient);
   }
 
   @Patch(':id/complete')

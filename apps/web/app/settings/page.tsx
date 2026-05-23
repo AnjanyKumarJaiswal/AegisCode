@@ -7,12 +7,18 @@ import {
     Key, Puzzle, Bell,
     Copy, Eye, EyeOff, RefreshCw, Info, User
 } from "lucide-react";
+import { formatRelativeTime } from "../utils/ideRedirect";
 
 interface Settings {
     projectId: string;
     secretKey: string;
     criticalAlerts: boolean;
     weeklySummary: boolean;
+    integration?: {
+        ideClient: string | null;
+        lastSyncAt: string | null;
+        connected: boolean;
+    };
 }
 
 export default function SettingsPage() {
@@ -57,6 +63,13 @@ export default function SettingsPage() {
             console.error("Failed to save settings:", err);
         }
     };
+
+    const integration = settings.integration;
+    const ideLabel = integration?.ideClient
+        ? `${integration.ideClient} Integration`
+        : "IDE Integration";
+    const isConnected = integration?.connected ?? false;
+    const lastSyncLabel = formatRelativeTime(integration?.lastSyncAt);
 
     return (
         <DashboardShell>
@@ -162,16 +175,18 @@ export default function SettingsPage() {
                                         <div className="w-6 h-6 border-2 border-[#4A4440] rounded-sm opacity-50" />
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-bold text-[#F5F2EE] mb-1">VS Code / Cursor Integration</h4>
+                                        <h4 className="text-sm font-bold text-[#F5F2EE] mb-1">{ideLabel}</h4>
                                         <p className="text-[11px] font-mono text-[#4A4440]">Real-time vulnerability scanning in your IDE.</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <div className="flex items-center gap-2 text-[9px] font-mono text-[#7A9970] uppercase tracking-widest mb-1">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-[#7A9970]" />
-                                        Connected
+                                    <div className={`flex items-center gap-2 text-[9px] font-mono uppercase tracking-widest mb-1 ${isConnected ? "text-[#7A9970]" : "text-[#4A4440]"}`}>
+                                        <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? "bg-[#7A9970]" : "bg-[#4A4440]"}`} />
+                                        {isConnected ? "Connected" : "Not Connected"}
                                     </div>
-                                    <p className="text-[8px] font-mono text-[#4A4440] uppercase tracking-widest">Last Sync: 2m ago</p>
+                                    <p className="text-[8px] font-mono text-[#4A4440] uppercase tracking-widest">
+                                        Last Sync: {lastSyncLabel}
+                                    </p>
                                 </div>
                             </div>
                         </div>

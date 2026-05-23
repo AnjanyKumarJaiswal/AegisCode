@@ -3,6 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
+import {
+  beginIdeHandoff,
+  getRedirectUriFromSearch,
+  isIdeAuthCallbackUri,
+  isIdeHandoffPending,
+} from "../utils/ideRedirect";
 import "./signin.css";
 
 
@@ -51,11 +57,39 @@ export default function SignInPage() {
     };
   }, []);
 
+  const ideHandoffStarted = useRef(false);
+
+  function handoffToIde(token: string): boolean {
+    const redirectUri = getRedirectUriFromSearch(window.location.search);
+    if (!redirectUri || !isIdeAuthCallbackUri(redirectUri)) {
+      return false;
+    }
+
+    if (ideHandoffStarted.current) {
+      return true;
+    }
+    ideHandoffStarted.current = true;
+
+    beginIdeHandoff(redirectUri, token);
+    return true;
+  }
+
   useEffect(() => {
-    if (!auth.isLoading && auth.user) {
+    if (isIdeHandoffPending()) {
+      return;
+    }
+
+    if (!auth.isLoading && auth.user && auth.token) {
+      const redirectUri = getRedirectUriFromSearch(window.location.search);
+
+      if (redirectUri && isIdeAuthCallbackUri(redirectUri)) {
+        handoffToIde(auth.token);
+        return;
+      }
+
       router.replace("/dashboard");
     }
-  }, [auth.isLoading, auth.user, router]);
+  }, [auth.isLoading, auth.user, auth.token, router]);
 
   const [urlError, setUrlError] = useState<string | null>(null);
   const urlErrorRead = useRef(false);
@@ -111,17 +145,8 @@ export default function SignInPage() {
         token = await auth.register({ email, password });
       }
 
-      const params = new URLSearchParams(window.location.search);
-      const redirectUri = params.get("redirect_uri");
-
-      if (redirectUri) {
-        try {
-          const url = new URL(redirectUri);
-          url.searchParams.set("token", token);
-          window.location.href = url.toString();
-        } catch (err) {
-          console.error("Invalid redirect_uri", err);
-        }
+      if (handoffToIde(token)) {
+        return;
       }
 
       router.push("/dashboard");

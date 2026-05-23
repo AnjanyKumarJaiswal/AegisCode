@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isTokenExpired } from "@aegiscode/shared";
 import { useAuth } from "../../context/AuthContext";
+import { beginIdeHandoff, isIdeAuthCallbackUri } from "../../utils/ideRedirect";
 
 export default function AuthCallbackHandler() {
   const router = useRouter();
@@ -29,28 +30,18 @@ export default function AuthCallbackHandler() {
       return;
     }
 
-    if (redirectUri) {
-      try {
-        const url = new URL(redirectUri);
-        url.searchParams.set("token", token);
-
-        window.location.href = url.toString();
-
-        loginWithToken(token).finally(() => {
-          router.replace("/dashboard");
-        });
-        return;
-      } catch (err) {
-        console.error("Invalid redirect_uri", err);
-      }
+    if (redirectUri && isIdeAuthCallbackUri(redirectUri)) {
+      void loginWithToken(token);
+      beginIdeHandoff(redirectUri, token);
+      return;
     }
-    if (source === "vscode") {
-      const vscodeUri = `vscode://aegiscode.aegiscode/auth/callback?token=${encodeURIComponent(token)}`;
-      window.location.href = vscodeUri;
 
-      loginWithToken(token).finally(() => {
-        router.replace("/dashboard");
-      });
+    if (source === "vscode") {
+      void loginWithToken(token);
+      beginIdeHandoff(
+        `vscode://aegiscode.aegiscode/auth/callback`,
+        token,
+      );
       return;
     }
 

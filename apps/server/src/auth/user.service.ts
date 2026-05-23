@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import type { User } from '@prisma/client';
 import { encrypt, decrypt } from './crypto.util';
@@ -58,5 +59,35 @@ export class UserService {
       create: createData,
     });
     return this.decryptUserTokens(user) as User;
+  }
+
+  async recordIdeClient(userId: string, ideClient: string): Promise<void> {
+    const trimmed = ideClient.trim();
+    if (!trimmed) return;
+
+    const existing = await this.prisma.userSettings.findUnique({
+      where: { userId },
+    });
+
+    if (existing) {
+      await this.prisma.userSettings.update({
+        where: { userId },
+        data: {
+          lastIdeClient: trimmed,
+          lastIdeSyncAt: new Date(),
+        },
+      });
+      return;
+    }
+
+    await this.prisma.userSettings.create({
+      data: {
+        userId,
+        projectId: `aegis-${userId.slice(0, 8)}`,
+        secretKey: encrypt(`ak_live_${crypto.randomBytes(24).toString('hex')}`),
+        lastIdeClient: trimmed,
+        lastIdeSyncAt: new Date(),
+      },
+    });
   }
 }

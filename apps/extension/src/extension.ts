@@ -13,6 +13,7 @@ import {
     type LiveFileItem,
 } from './ui/aegisSidebarPanel';
 import { scan, type ScanResponse, type Severity, type Vulnerability } from './api/scanApi';
+import { getIdeClientName } from './utils/ideClient';
 import { logger } from './utils/logger';
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -121,7 +122,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 totalIssues: totalIssues(),
                 liveFiles: liveFiles(),
                 username: username || undefined,
-                ide: 'VS Code',
+                ide: getIdeClientName(),
             });
             return;
         }
@@ -137,7 +138,7 @@ export async function activate(context: vscode.ExtensionContext) {
             totalIssues: totalIssues(),
             recentScans,
             username: username || undefined,
-            ide: 'VS Code',
+            ide: getIdeClientName(),
         });
     };
 

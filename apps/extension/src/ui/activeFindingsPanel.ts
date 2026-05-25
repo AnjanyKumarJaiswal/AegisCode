@@ -1,6 +1,11 @@
 import * as vscode from "vscode";
 import type { Vulnerability, ScanResponse, Severity } from "../api/scanApi";
 import {
+  buildWebviewStyles,
+  severityColor as themeSeverityColor,
+  WEBVIEW_FONT_CSP,
+} from "./webviewTheme";
+import {
   AlertTriangle,
   AlertCircle,
   Info,
@@ -144,28 +149,22 @@ class ActiveFindingsPanel {
   }
 
   private severityColor(severity: Severity): string {
-    const map: Record<Severity, string> = {
-      critical: "#E05A5A",
-      high: "#ff9d12",
-      medium: "#dfc15b",
-      low: "#7A9970",
-      info: "#7fa0b7",
-    };
-    return map[severity];
+    return themeSeverityColor(severity);
   }
 
   private severityIcon(severity: Severity, size = 14): string {
+    const color = this.severityColor(severity);
     switch (severity) {
       case "critical":
-        return `<span style="color:#E05A5A">${AlertTriangle(size)}</span>`;
+        return `<span style="color:${color}">${AlertTriangle(size)}</span>`;
       case "high":
-        return `<span style="color:#ff9d12">${AlertCircle(size)}</span>`;
+        return `<span style="color:${color}">${AlertCircle(size)}</span>`;
       case "medium":
-        return `<span style="color:#dfc15b">${Info(size)}</span>`;
+        return `<span style="color:${color}">${Info(size)}</span>`;
       case "low":
-        return `<span style="color:#7A9970">${CheckCircle(size)}</span>`;
+        return `<span style="color:${color}">${CheckCircle(size)}</span>`;
       default:
-        return `<span style="color:#7fa0b7">${Info(size)}</span>`;
+        return `<span style="color:${color}">${Info(size)}</span>`;
     }
   }
 
@@ -235,10 +234,10 @@ class ActiveFindingsPanel {
                     <span class="dot">|</span> Line ${selected.line}
                 </div>
 
-                <div class="section-label">DIAGNOSIS</div>
+                <div class="section-head">Why this is a risk</div>
                 <div class="focus-description">${this.escape(selected.description)}</div>
 
-                <div class="section-label">REMEDIATION STRATEGY</div>
+                <div class="section-head">Recommended fix</div>
                 <div class="code-card">
                     <div class="code-meta">
                         <span>${this.escape(this.relativePath(selected.filePath))}</span>
@@ -248,7 +247,7 @@ class ActiveFindingsPanel {
                 </div>
 
                 <button class="primary-action" data-command="copy" data-id="${this.escape(selected.id)}">
-                    ${Sparkles(14)} Apply Fix via Aegis Code
+                    ${Sparkles(14)} Copy Recommended Fix
                 </button>
 
                 <div class="action-grid">
@@ -279,7 +278,7 @@ class ActiveFindingsPanel {
             <div class="empty-state">
                 <div class="empty-icon">${Target(28)}</div>
                 <div class="empty-title">No active findings</div>
-                <div class="empty-copy">Run a scan to populate this panel.</div>
+                <div class="empty-copy-text">Run a scan to populate this panel.</div>
             </div>
         `;
 
@@ -287,391 +286,13 @@ class ActiveFindingsPanel {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; script-src 'nonce-${nonce}'; ${WEBVIEW_FONT_CSP}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AegisCode Active Findings</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
-
-        :root {
-            --bg: #0E0D0C;
-            --panel: #1A1714;
-            --panel-2: #201D19;
-            --border: #2E2A26;
-            --border-subtle: rgba(255,255,255,0.04);
-            --copy: #E8E2D9;
-            --copy-dim: #A89F94;
-            --copy-faint: #5C5650;
-            --amber: #FF9D12;
-            --red: #E05A5A;
-            --green: #7A9970;
-            --yellow: #dfc15b;
-            --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
-            --font-sans: "Inter", "Segoe UI", -apple-system, sans-serif;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background: var(--bg);
-            color: var(--copy);
-            font-family: var(--font-sans);
-            font-size: 13px;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        button {
-            font-family: inherit;
-            color: inherit;
-            cursor: pointer;
-            border: none;
-            background: none;
-            outline: none;
-        }
-
-        .shell {
-            min-height: 100vh;
-            padding: 16px 14px 22px;
-        }
-
-        /* ── Header ─────────────────────────────────── */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 18px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header-title {
-            font-family: var(--font-mono);
-            color: var(--copy);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .count-badge {
-            background: var(--panel-2);
-            border-radius: 4px;
-            padding: 2px 7px;
-            font-family: var(--font-mono);
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--copy-dim);
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 4px;
-        }
-
-        .icon-btn {
-            width: 26px;
-            height: 26px;
-            display: grid;
-            place-items: center;
-            border-radius: 6px;
-            color: var(--copy-dim);
-            transition: all 0.15s ease;
-        }
-
-        .icon-btn:hover {
-            background: rgba(255,255,255,0.06);
-            color: var(--copy);
-        }
-
-        /* ── Focus Card ──────────────────────────────── */
-        .focus-card {
-            background: var(--panel-2);
-            border-left: 3px solid var(--amber);
-            padding: 18px 16px;
-            margin-bottom: 12px;
-        }
-
-        .severity-critical { border-left-color: var(--red); }
-        .severity-high { border-left-color: var(--amber); }
-        .severity-medium { border-left-color: var(--yellow); }
-        .severity-low { border-left-color: var(--green); }
-        .severity-info { border-left-color: #7fa0b7; }
-
-        .focus-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .focus-label {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .focus-confidence {
-            background: var(--panel);
-            color: var(--copy-dim);
-            padding: 3px 8px;
-            font-family: var(--font-mono);
-            font-size: 11px;
-            font-weight: 700;
-            border-radius: 4px;
-        }
-
-        .focus-title {
-            font-size: 20px;
-            font-weight: 700;
-            line-height: 1.2;
-            color: #f0efec;
-            margin-bottom: 10px;
-        }
-
-        .focus-meta {
-            color: var(--copy-dim);
-            font-family: var(--font-mono);
-            font-size: 11px;
-            font-weight: 500;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .dot {
-            color: var(--copy-faint);
-            margin: 0 4px;
-        }
-
-        /* ── Section Labels ──────────────────────────── */
-        .section-label {
-            font-family: var(--font-mono);
-            color: var(--copy-faint);
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .focus-description {
-            color: var(--copy);
-            font-size: 13px;
-            line-height: 1.6;
-            margin-bottom: 18px;
-        }
-
-        .focus-description code {
-            font-family: var(--font-mono);
-            background: rgba(255,255,255,0.06);
-            padding: 1px 5px;
-            border-radius: 3px;
-            font-size: 12px;
-            color: var(--amber);
-        }
-
-        /* ── Code Card ───────────────────────────────── */
-        .code-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-
-        .code-meta {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--border);
-            font-family: var(--font-mono);
-            color: var(--copy-faint);
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .code-lang {
-            color: var(--copy-dim);
-        }
-
-        .code-block {
-            margin: 0;
-            padding: 14px 12px;
-            white-space: pre-wrap;
-            font-family: var(--font-mono);
-            font-size: 11px;
-            line-height: 1.65;
-            color: var(--copy);
-        }
-
-        /* ── Primary Action Button ───────────────────── */
-        .primary-action {
-            width: 100%;
-            background: var(--amber);
-            color: #1A1000;
-            padding: 14px 12px;
-            font-family: var(--font-mono);
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 0.02em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 10px;
-            transition: all 0.15s ease;
-        }
-
-        .primary-action:hover {
-            background: #FFB040;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(255,157,18,0.25);
-        }
-
-        .primary-action:active {
-            transform: translateY(0);
-        }
-
-        /* ── Action Grid ─────────────────────────────── */
-        .action-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin-bottom: 16px;
-        }
-
-        .action-btn {
-            width: 100%;
-            background: var(--panel);
-            color: var(--copy);
-            border: 1px solid var(--border);
-            padding: 10px 10px;
-            font-size: 11px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.15s ease;
-        }
-
-        .action-btn:hover {
-            background: var(--panel-2);
-            border-color: var(--copy-faint);
-        }
-
-        /* ── Finding List ────────────────────────────── */
-        .finding-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .finding-item {
-            width: 100%;
-            background: transparent;
-            padding: 12px 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-subtle);
-            transition: background 0.12s ease;
-        }
-
-        .finding-item:hover {
-            background: rgba(255,255,255,0.03);
-        }
-
-        .finding-row {
-            display: grid;
-            grid-template-columns: 16px 1fr auto;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .finding-icon {
-            display: flex;
-            align-items: center;
-        }
-
-        .finding-copy {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .finding-severity {
-            font-family: var(--font-mono);
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-        }
-
-        .finding-title {
-            color: var(--copy);
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .finding-location {
-            font-family: var(--font-mono);
-            color: var(--copy-faint);
-            font-size: 10px;
-            text-align: right;
-        }
-
-        /* ── Empty State ─────────────────────────────── */
-        .empty-state {
-            min-height: 70vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .empty-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            background: var(--panel-2);
-            display: grid;
-            place-items: center;
-            color: var(--amber);
-            margin-bottom: 18px;
-        }
-
-        .empty-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #f0eeea;
-            margin-bottom: 8px;
-        }
-
-        .empty-copy {
-            color: var(--copy-dim);
-            font-size: 13px;
-            max-width: 280px;
-        }
-
-        /* ── Scrollbar ───────────────────────────────── */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--copy-faint); }
-    </style>
+    <style>${buildWebviewStyles("findings")}</style>
 </head>
 <body>
-    <div class="shell">
+    <div class="shell findings-shell">
         <div class="header">
             <div class="header-left">
                 <span class="header-title">Active Findings</span>

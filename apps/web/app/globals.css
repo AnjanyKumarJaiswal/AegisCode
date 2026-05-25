@@ -15,6 +15,19 @@
 
     --font-sans: "Geist", system-ui, sans-serif;
     --font-mono: "IBM Plex Mono", monospace;
+
+    /* Hero section & global UI variables */
+    --amber-grad-a: #D47C2F;
+    --amber-grad-b: #E8C97A;
+    --border-tag: #7A6020;
+    --amber-tag: #BFA560;
+    --grey-sub: #7A746E;
+    --white-cta: #F5F2EE;
+    --bg-terminal: #141210;
+    --border-term: #2E2A26;
+    --grey-term: #4A4440;
+    --term-file: #F5F2EE;
+    --amber-vuln: #D4762A;
 }
 
 body {

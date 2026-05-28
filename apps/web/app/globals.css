@@ -35,6 +35,11 @@ body {
     color: var(--white);
     font-family: var(--font-sans);
     margin: 0;
+    overflow-x: hidden;
+}
+
+html {
+    overflow-x: hidden;
 }
 
 .custom-scrollbar::-webkit-scrollbar {

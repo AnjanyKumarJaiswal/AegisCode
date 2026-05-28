@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DashboardShell from "../../../components/dashboard/DashboardShell";
 import Link from "next/link";
 import { User, ChevronLeft, Camera, Fingerprint } from "lucide-react";
 
@@ -64,8 +63,7 @@ export default function EditProfilePage() {
   };
 
   return (
-    <DashboardShell>
-      <div className="content-inner !max-w-[800px]">
+    <div className="content-inner !max-w-[800px]">
         <Link
           href="/settings/user-profile"
           className="flex items-center gap-2 text-[10px] font-mono text-[#4A4440] hover:text-[#C4701F] uppercase tracking-widest transition-colors mb-10"
@@ -177,6 +175,5 @@ export default function EditProfilePage() {
           </div>
         </div>
       </div>
-    </DashboardShell>
   );
 }

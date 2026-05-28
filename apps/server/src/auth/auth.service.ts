@@ -6,6 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from './user.service';
+import { ApiKeyService } from './api-key.service';
 import type { User } from '@prisma/client';
 import {
   JwtPayload,
@@ -17,6 +18,7 @@ import {
 export class AuthService {
   constructor(
     private readonly userService: UserService,
+    private readonly apiKeyService: ApiKeyService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -76,6 +78,11 @@ export class AuthService {
   async loginWithGithub(user: User) {
     const token = this.signToken(user);
     return { user: this.sanitizeUser(user), token };
+  }
+
+  async loginWithApiKey(apiKey: string): Promise<AuthResponse> {
+    const user = await this.apiKeyService.authenticate(apiKey);
+    return this.login(user);
   }
 
   async me(userId: string) {

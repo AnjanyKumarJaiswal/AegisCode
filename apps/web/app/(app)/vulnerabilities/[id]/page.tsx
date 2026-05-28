@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DashboardShell from "../../components/dashboard/DashboardShell";
 import {
   Wrench,
   AlertTriangle,
@@ -115,8 +114,7 @@ export default function VulnerabilityDetailPage() {
   };
 
   return (
-    <DashboardShell>
-      <div className="content-inner !max-w-[1100px]">
+    <div className="content-inner !max-w-[1100px]">
         <Link
           href="/vulnerabilities"
           className="flex items-center gap-2 text-[10px] font-mono text-[#4A4440] hover:text-[#C4701F] uppercase tracking-widest mb-8 transition-colors group"
@@ -414,6 +412,5 @@ export default function VulnerabilityDetailPage() {
           </>
         ) : null}
       </div>
-    </DashboardShell>
   );
 }

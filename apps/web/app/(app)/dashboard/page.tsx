@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Download, AlertTriangle, Activity, ShieldAlert } from "lucide-react";
 
 interface DashboardStats {
@@ -118,9 +119,12 @@ export default function DashboardPage() {
                 Active Threats
               </h2>
             </div>
-            <button className="text-[10px] font-mono text-[#D4762A] hover:text-[#F5F2EE] uppercase tracking-widest">
+            <Link
+              href="/vulnerabilities"
+              className="text-[10px] font-mono text-[#D4762A] hover:text-[#F5F2EE] uppercase tracking-widest transition-colors"
+            >
               View All Alerts
-            </button>
+            </Link>
           </div>
           <p className="text-[#4A4440] text-[11px] mb-8 pl-8">
             Immediate action required on high-severity incidents.

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import DashboardShell from "../components/dashboard/DashboardShell";
 import { Target, TrendingUp, CheckCircle } from "lucide-react";
 
 interface RiskDataPoint {
@@ -93,8 +92,7 @@ export default function ThreatHunterPage() {
   const areaData = `${pathData} L1000,200 L0,200 Z`;
 
   return (
-    <DashboardShell>
-      <div className="content-inner">
+    <div className="content-inner">
         <div className="mb-10">
           <h1 className="text-xl font-bold text-[#F5F2EE] mb-2">
             Security Posture Analysis
@@ -274,6 +272,5 @@ export default function ThreatHunterPage() {
           </div>
         </div>
       </div>
-    </DashboardShell>
   );
 }

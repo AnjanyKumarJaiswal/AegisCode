@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserService } from './user.service';
+import { ApiKeyService } from './api-key.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { GithubStrategy } from './strategies/github.strategy';
@@ -22,10 +23,11 @@ import { GithubStrategy } from './strategies/github.strategy';
   providers: [
     AuthService,
     UserService,
+    ApiKeyService,
     LocalStrategy,
     JwtStrategy,
     GithubStrategy,
   ],
-  exports: [AuthService, UserService, JwtModule],
+  exports: [AuthService, UserService, ApiKeyService, JwtModule],
 })
 export class AuthModule {}

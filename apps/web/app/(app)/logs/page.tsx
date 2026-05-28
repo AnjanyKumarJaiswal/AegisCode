@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DashboardShell from "../components/dashboard/DashboardShell";
 import { Search, Filter, Calendar, Code, Box, Database } from "lucide-react";
 
 interface ScanLog {
@@ -38,8 +37,7 @@ export default function AuditLogsPage() {
   }, []);
 
   return (
-    <DashboardShell>
-      <div className="content-inner">
+    <div className="content-inner">
         <div className="flex items-end justify-between mb-10">
           <div>
             <p className="dash-subtitle !text-[#C4701F]/80 mb-1">AUDIT LOGS</p>
@@ -159,6 +157,5 @@ export default function AuditLogsPage() {
           </button>
         </div>
       </div>
-    </DashboardShell>
   );
 }

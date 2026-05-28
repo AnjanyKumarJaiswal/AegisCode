@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DashboardShell from "../components/dashboard/DashboardShell";
 import Link from "next/link";
 import {
   Search,
@@ -54,8 +53,7 @@ export default function VulnerabilitiesPage() {
   }, [searchQuery, severityFilter]);
 
   return (
-    <DashboardShell>
-      <div className="content-inner">
+    <div className="content-inner">
         <div className="flex items-start justify-between mb-12">
           <div>
             <h1 className="dash-title !text-5xl !font-bold mb-2">
@@ -187,6 +185,5 @@ export default function VulnerabilitiesPage() {
           </button>
         </div>
       </div>
-    </DashboardShell>
   );
 }

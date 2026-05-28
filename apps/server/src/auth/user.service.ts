@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import type { User } from '@prisma/client';
 import { encrypt, decrypt } from './crypto.util';
@@ -83,8 +82,6 @@ export class UserService {
     await this.prisma.userSettings.create({
       data: {
         userId,
-        projectId: `aegis-${userId.slice(0, 8)}`,
-        secretKey: encrypt(`ak_live_${crypto.randomBytes(24).toString('hex')}`),
         lastIdeClient: trimmed,
         lastIdeSyncAt: new Date(),
       },

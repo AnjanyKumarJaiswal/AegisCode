@@ -6,11 +6,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { encrypt, decrypt } from '../../auth/crypto.util';
 
 type SettingsPayload = {
-  projectId?: unknown;
-  secretKey?: unknown;
   criticalAlerts?: unknown;
   weeklySummary?: unknown;
 };
@@ -46,22 +43,6 @@ function optionalBoolean(value: unknown, field: string): boolean | undefined {
   return value;
 }
 
-function defaultProjectId(userId: string): string {
-  return `aegis-${userId.slice(0, 8)}`;
-}
-
-function generateSecretKey(): string {
-  return `ak_live_${crypto.randomBytes(24).toString('hex')}`;
-}
-
-function safeDecrypt(value: string): string {
-  try {
-    return decrypt(value);
-  } catch {
-    return value;
-  }
-}
-
 function displayName(user: { email: string; username: string | null }): string {
   return user.username ?? user.email.split('@')[0] ?? 'Operator';
 }
@@ -91,11 +72,7 @@ export class SettingsService {
     if (existing) return existing;
 
     return this.db.userSettings.create({
-      data: {
-        userId,
-        projectId: defaultProjectId(userId),
-        secretKey: encrypt(generateSecretKey()),
-      },
+      data: { userId },
     });
   }
 
@@ -117,8 +94,6 @@ export class SettingsService {
       null;
 
     return {
-      projectId: settings.projectId,
-      secretKey: safeDecrypt(settings.secretKey),
       criticalAlerts: settings.criticalAlerts,
       weeklySummary: settings.weeklySummary,
       updatedAt: settings.updatedAt.toISOString(),
@@ -132,47 +107,27 @@ export class SettingsService {
 
   async updateSettings(userId: string, rawBody: unknown) {
     const body = asObject<SettingsPayload>(rawBody);
-    const projectId = optionalString(body.projectId, 'projectId');
-    const secretKey = optionalString(body.secretKey, 'secretKey');
     const criticalAlerts = optionalBoolean(
       body.criticalAlerts,
       'criticalAlerts',
     );
     const weeklySummary = optionalBoolean(body.weeklySummary, 'weeklySummary');
 
-    if (projectId !== undefined && projectId.length < 3) {
-      throw new BadRequestException('projectId must be at least 3 characters');
-    }
-    if (secretKey !== undefined && secretKey.length < 12) {
-      throw new BadRequestException('secretKey must be at least 12 characters');
-    }
-
     await this.ensureSettings(userId);
 
-    try {
-      const settings = await this.db.userSettings.update({
-        where: { userId },
-        data: {
-          ...(projectId !== undefined ? { projectId } : {}),
-          ...(secretKey !== undefined ? { secretKey: encrypt(secretKey) } : {}),
-          ...(criticalAlerts !== undefined ? { criticalAlerts } : {}),
-          ...(weeklySummary !== undefined ? { weeklySummary } : {}),
-        },
-      });
+    const settings = await this.db.userSettings.update({
+      where: { userId },
+      data: {
+        ...(criticalAlerts !== undefined ? { criticalAlerts } : {}),
+        ...(weeklySummary !== undefined ? { weeklySummary } : {}),
+      },
+    });
 
-      return {
-        projectId: settings.projectId,
-        secretKey: safeDecrypt(settings.secretKey),
-        criticalAlerts: settings.criticalAlerts,
-        weeklySummary: settings.weeklySummary,
-        updatedAt: settings.updatedAt.toISOString(),
-      };
-    } catch (error: any) {
-      if (error?.code === 'P2002') {
-        throw new ConflictException('Project ID is already in use');
-      }
-      throw error;
-    }
+    return {
+      criticalAlerts: settings.criticalAlerts,
+      weeklySummary: settings.weeklySummary,
+      updatedAt: settings.updatedAt.toISOString(),
+    };
   }
 
   async getUserProfile(userId: string) {

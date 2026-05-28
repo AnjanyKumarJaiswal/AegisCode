@@ -225,7 +225,6 @@ export default function SignInPage() {
           <span className="signin-divider-text">or</span>
         </div>
 
-        {}
         {activeError && (
           <div className="signin-error" role="alert">
             {activeError}

@@ -438,8 +438,8 @@ export default function SettingsPage() {
             <div className="mt-8 flex gap-3 p-4 bg-[#C4701F]/5 border border-[#C4701F]/10 rounded-sm">
               <Info size={14} className="text-[#C4701F] flex-shrink-0" />
               <p className="text-[9px] font-mono text-[#A89F94] leading-relaxed italic">
-                Use an API key on the sign-in page or in the extension to
-                authenticate without GitHub.
+                Use an API key in the IDE extension to authenticate without
+                GitHub.
               </p>
             </div>
           </div>

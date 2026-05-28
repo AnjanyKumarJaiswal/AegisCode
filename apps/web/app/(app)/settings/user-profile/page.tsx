@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DashboardShell from "../../components/dashboard/DashboardShell";
 import Link from "next/link";
 import { User, ChevronLeft, Clock, Zap, Settings } from "lucide-react";
 
@@ -44,8 +43,7 @@ export default function UserProfilePage() {
   }, []);
 
   return (
-    <DashboardShell>
-      <div className="content-inner !max-w-[800px]">
+    <div className="content-inner !max-w-[800px]">
         <div className="flex justify-between items-end mb-10">
           <div>
             <Link
@@ -172,6 +170,5 @@ export default function UserProfilePage() {
           </div>
         </div>
       </div>
-    </DashboardShell>
   );
 }

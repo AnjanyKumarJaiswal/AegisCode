@@ -108,6 +108,7 @@ export default function SignInPage() {
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [apiKey, setApiKey] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -128,6 +129,27 @@ export default function SignInPage() {
     const params = new URLSearchParams(window.location.search);
     const redirectUri = params.get("redirect_uri");
     window.location.href = auth.githubOAuthUrl(redirectUri || undefined);
+  }
+
+  async function handleApiKeySignIn(e: React.FormEvent) {
+    e.preventDefault();
+    if (submitting) return;
+
+    clearErrors();
+    setSubmitting(true);
+
+    try {
+      const token = await auth.loginWithApiKey(apiKey.trim());
+
+      if (handoffToIde(token)) {
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch {
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -224,6 +246,45 @@ export default function SignInPage() {
         <div className="signin-divider" aria-hidden="true">
           <span className="signin-divider-text">or</span>
         </div>
+
+        {mode === "login" && (
+          <form className="signin-form" onSubmit={handleApiKeySignIn} noValidate>
+            <div className="field-group">
+              <label className="field-label" htmlFor="apiKey">
+                API key
+              </label>
+              <div className="field-input-wrap">
+                <input
+                  id="apiKey"
+                  type="password"
+                  className="field-input"
+                  placeholder="ak_live_..."
+                  autoComplete="off"
+                  value={apiKey}
+                  onChange={(e) => {
+                    setApiKey(e.target.value);
+                    clearErrors();
+                  }}
+                />
+              </div>
+            </div>
+            <div className="signin-submit-wrap">
+              <button
+                type="submit"
+                className="signin-submit"
+                disabled={submitting || apiKey.trim().length === 0}
+              >
+                {submitting ? "Signing in..." : "Sign in with API key"}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {mode === "login" && (
+          <div className="signin-divider" aria-hidden="true">
+            <span className="signin-divider-text">or</span>
+          </div>
+        )}
 
         {}
         {activeError && (

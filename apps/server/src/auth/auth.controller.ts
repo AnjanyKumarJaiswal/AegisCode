@@ -43,6 +43,17 @@ export class AuthController {
     return this.authService.login(req.user as User);
   }
 
+  @Post('api-key')
+  @HttpCode(HttpStatus.OK)
+  async loginWithApiKey(@Body() body: { apiKey?: unknown }) {
+    const apiKey =
+      typeof body?.apiKey === 'string' ? body.apiKey.trim() : '';
+    if (!apiKey) {
+      throw new BadRequestException('apiKey is required');
+    }
+    return this.authService.loginWithApiKey(apiKey);
+  }
+
   @Get('github')
   @UseGuards(GithubAuthGuard)
   githubRedirect() {}

@@ -1,5 +1,6 @@
 import type {
   AuthResponse,
+  ApiKeyLoginPayload,
   LoginPayload,
   RegisterPayload,
   SanitizedUser,
@@ -62,6 +63,10 @@ export class AuthApiClient {
 
   async login(payload: LoginPayload): Promise<AuthResponse> {
     return this.request<AuthResponse>('POST', AUTH_ROUTES.LOGIN, payload);
+  }
+
+  async loginWithApiKey(payload: ApiKeyLoginPayload): Promise<AuthResponse> {
+    return this.request<AuthResponse>('POST', AUTH_ROUTES.API_KEY, payload);
   }
 
   async me(token: string): Promise<SanitizedUser> {

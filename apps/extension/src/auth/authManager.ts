@@ -60,11 +60,11 @@ export async function handleOAuthCallback(token: string): Promise<boolean> {
 export async function login(): Promise<boolean> {
   const raw = await vscode.window.showInputBox({
     title: "AegisCode — Sign In",
-    prompt: "Paste your AegisCode API token from the dashboard",
+    prompt: "Paste your AegisCode API key from Settings → API Keys",
     password: true,
     ignoreFocusOut: true,
     validateInput: (value) =>
-      value.trim().length === 0 ? "Token cannot be empty" : null,
+      value.trim().length === 0 ? "API key cannot be empty" : null,
   });
 
   if (!raw) {
@@ -72,36 +72,30 @@ export async function login(): Promise<boolean> {
     return false;
   }
 
-  const token = raw.trim();
-
-  if (isTokenExpired(token)) {
-    vscode.window.showErrorMessage(
-      "AegisCode: This token has expired. Please copy a fresh token from the dashboard.",
-    );
-    return false;
-  }
+  const apiKey = raw.trim();
 
   try {
     const client = createAuthClient();
-    const user = await client.me(token);
+    const { user, token } = await client.loginWithApiKey({ apiKey });
 
     await setToken(token);
     const displayName = deriveDisplayName(user);
     await setUsername(displayName);
+    await syncIdeClient();
 
     logger.info(`Signed in as ${displayName} (${user.email})`);
     vscode.window.showInformationMessage(`AegisCode: Signed in as ${displayName}.`);
     return true;
   } catch (err) {
     if (err instanceof AuthApiError) {
-      logger.error(`Token validation failed — HTTP ${err.status}`, err.message);
+      logger.error(`API key login failed — HTTP ${err.status}`, err.message);
       vscode.window.showErrorMessage(
         err.status === 401
-          ? "AegisCode: Token rejected. Please copy a fresh token."
+          ? "AegisCode: Invalid API key. Create one in Settings → API Keys."
           : `AegisCode: Server error (HTTP ${err.status}). Check Settings → AegisCode.`,
       );
     } else {
-      logger.error("Token validation failed — network error", err);
+      logger.error("API key login failed — network error", err);
       vscode.window.showErrorMessage("AegisCode: Could not connect to the server.");
     }
     return false;

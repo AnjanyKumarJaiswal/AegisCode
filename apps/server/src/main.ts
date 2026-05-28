@@ -9,9 +9,12 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
   
-  app.enableCors({
-    origin: process.env.FRONTEND_BASE_URL,
-    credentials: true,
+  app.enableCors((req: any, callback: any) => {
+    const isHealth = req.path === '/health' || req.url === '/health';
+    const corsOptions = isHealth
+      ? { origin: '*' }
+      : { origin: process.env.FRONTEND_BASE_URL, credentials: true };
+    callback(null, corsOptions);
   });
 
   

@@ -27,9 +27,14 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface ApiKeyLoginPayload {
+  apiKey: string;
+}
+
 export const AUTH_ROUTES = {
   REGISTER: "/api/v1/auth/register",
   LOGIN: "/api/v1/auth/login",
+  API_KEY: "/api/v1/auth/api-key",
   GITHUB: "/api/v1/auth/github",
   GITHUB_CALLBACK: "/api/v1/auth/github/callback",
   ME: "/api/v1/auth/me",

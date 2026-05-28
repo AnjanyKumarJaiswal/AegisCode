@@ -20,6 +20,7 @@ model User {
   sessions       CodingSession[]
   settings       UserSettings?
   profile        UserProfile?
+  apiKeys        ApiKey[]
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 }
@@ -28,14 +29,27 @@ model UserSettings {
   id             String           @id @default(uuid())
   userId         String           @unique
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projectId      String           @unique
-  secretKey      String           @db.Text
   criticalAlerts Boolean          @default(true)
   weeklySummary  Boolean          @default(false)
   lastIdeClient  String?
   lastIdeSyncAt  DateTime?
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
+}
+
+model ApiKey {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  keyPrefix    String
+  keyHash      String
+  lastUsedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  revokedAt    DateTime?
+
+  @@index([userId])
+  @@index([keyPrefix])
 }
 
 model UserProfile {

@@ -28,6 +28,7 @@ interface AuthContextValue extends AuthState {
   login: (payload: LoginPayload) => Promise<string>;
   register: (payload: RegisterPayload) => Promise<string>;
   loginWithToken: (token: string) => Promise<void>;
+  loginWithApiKey: (apiKey: string) => Promise<string>;
   logout: () => Promise<void>;
   githubOAuthUrl: (redirectUri?: string) => string;
   clearError: () => void;
@@ -162,6 +163,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [persist],
   );
 
+  const loginWithApiKey = useCallback(
+    async (apiKey: string): Promise<string> => {
+      setState((s) => ({ ...s, isLoading: true, error: null }));
+      try {
+        const { user, token } = await getClient().loginWithApiKey({ apiKey });
+        await persist(token, user);
+        return token;
+      } catch {
+        setState((s) => ({
+          ...s,
+          isLoading: false,
+          error: "Invalid API key. Check your key and try again.",
+        }));
+        throw new Error("Invalid API key");
+      }
+    },
+    [persist],
+  );
+
   const logout = useCallback(async (): Promise<void> => {
     await clearStoredToken();
     setState({ user: null, token: null, isLoading: false, error: null });
@@ -183,6 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         loginWithToken,
+        loginWithApiKey,
         logout,
         githubOAuthUrl,
         clearError,

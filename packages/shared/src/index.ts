@@ -6,6 +6,7 @@ export type {
   AuthResponse,
   RegisterPayload,
   LoginPayload,
+  ApiKeyLoginPayload,
 } from "./types/auth";
 
 export { AUTH_ROUTES, AuthErrorCode } from "./types/auth";
